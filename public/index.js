@@ -80,7 +80,7 @@ sendSigninBtn.addEventListener('click', async (event) => {
                 if (token) {
                     // window.location.href = '/dashboard';
                     console.log("tokrn in dashboard",token)
-                    const response = await fetch('http://localhost:7000/dashboard', {
+                    const response = await fetch('https://api-financetracker.onrender.com/dashboard', {
                         method: 'POST',
                         headers: {
                             'authorization': `Bearer ${token}`

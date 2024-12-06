@@ -9,6 +9,7 @@ const expressLayouts = require('express-ejs-layouts');
 const nodemailer = require('nodemailer');
 const {SendMail,User} = require('./models/model')
 const crypto = require('crypto')
+const cors = require('cors');
 const bcrypt = require('bcrypt')
 dotenv.config();
 const app = express();
@@ -20,6 +21,9 @@ app.use('/public', express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(cors({
+    origin: 'https://financetracker-jlmk.onrender.com'
+  }));
 app.use(session({
     secret: process.env.JWT_secret || 'yourSecretKey', // Make sure to replace with a strong key
     resave: false,
@@ -70,7 +74,7 @@ app.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Send email with reset link
-    const resetUrl = `http://localhost:7000/reset-password/${token}`;
+    const resetUrl = `https://api-financetracker.onrender.com/reset-password/${token}`;
     const mailOptions = {
         to: user.Email,
         from: 'govardhanavivek32@gmail.com',
