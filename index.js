@@ -74,7 +74,7 @@ app.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Send email with reset link
-    const resetUrl = `https://api-financetracker.onrender.com/reset-password/${token}`;
+    const resetUrl = `https://financetracker-jlmk.onrender.com/reset-password/${token}`;
     const mailOptions = {
         to: user.Email,
         from: 'govardhanavivek32@gmail.com',
