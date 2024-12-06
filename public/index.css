@@ -1,0 +1,138 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(120deg, #bd87f7, #32538c);
+    overflow: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s ease;
+}
+
+.toggle {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+}
+
+.toggle button {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border: none;
+    background: none;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.toggle button.active {
+    font-weight: bold;
+    color: #2575fc;
+}
+
+.form {
+    display: none;
+    flex-direction: column;
+}
+
+.form.active {
+    display: flex;
+}
+
+h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.8rem;
+}
+
+input {
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #2575fc;
+    outline: none;
+}
+
+button {
+    padding: 0.8rem;
+    font-size: 1rem;
+    background: #2575fc;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #8da8cf;
+}
+
+
+
+.window{
+    width: 70%;
+    height: 50%;
+    justify-content: space-between;
+    display: flex;
+    padding: 10px 15px;
+    /* border: 2px solid black; */
+    align-items: center;
+    box-sizing: border-box;
+    box-shadow: 5px 5px 5px 2px rgb(240, 240, 67);
+}
+
+.title{
+    font-size: 2.3rem;
+    font-family:'Courier New', Courier, monospace;
+    color: rgb(214, 240, 64);
+}
+
+
+#forgot-password{
+    font-size: 12px;
+    text-align: end;
+    /* border: 1px solid; */
+    margin-top: 5px;
+    
+   
+}
+#forgot-password a { 
+   color: cornflowerblue;
+   text-decoration: none;
+   
+}
+
+
+@media (max-width: 480px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+}

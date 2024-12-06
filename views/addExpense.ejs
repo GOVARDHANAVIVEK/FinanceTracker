@@ -1,0 +1,260 @@
+<!-- views/dashboard.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Personal Finance Tracker</title>
+   <!-- Correct CSS link -->
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+    /* Basic styling for each transaction card */
+    .transaction-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .transaction-card .amount {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    .transaction-card .expense {
+        color: red;
+    }
+    .transaction-card .income {
+        color: green;
+    }
+    .transaction-date {
+        font-size: 0.9em;
+        color: #666;
+    }
+    .transaction-details {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .month-section{
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .year-section{
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    #Month-value, #Year-value{
+        color: rgb(51, 42, 52);
+     }
+
+    .user{
+        align-items: center;
+        justify-content: center;
+        /* border: 1px solid #f73f3f; */
+        text-align: center;
+        background-color: transparent;
+     }
+     #name{
+        color: cadetblue;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+     }
+    /* Form container styling */
+/* Form container styling */
+.expense-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #f5f7fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Flexbox layout for the form */
+.form-template {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 1000px;
+    align-items: center;
+   
+}
+
+/* Input and select box styling */
+.form-template input,
+.form-template select {
+    padding: 10px;
+    flex: 1; /* Allow flexible width */
+    height: 46.5px;
+    border: 1px solid #028fd0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 14px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+}
+
+/* Input focus effect */
+.form-template input:focus,
+.form-template select:focus {
+    border-color: #0056b3;
+    outline: none;
+}
+
+/* Button styling */
+.form-template button {
+    padding: 10px 20px;
+    height: 45px;
+    border: none;
+    border-radius: 6px;
+    background-color: #028fd0;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    width: 20%;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.form-template button:hover {
+    background-color: #0056b3;
+}
+
+/* Placeholder color */
+::placeholder {
+    color: #999;
+}
+
+/* Custom arrow for select dropdown */
+.form-template select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%23028fd0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+.category-description{
+    display: flex;
+    justify-content: space-between;
+    width: 25%;
+}
+.form-template input{
+    height: 25px;
+}
+
+</style>
+
+
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                <a href="/dashboard">Dashboard</a>
+            </li>
+            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                <a href="/dashboard/add-expense">Add Expense</a>
+            </li>
+            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                <a href="/dashboard/manage-expenses">Manage Expenses</a>
+            </li>
+            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                <a href="/dashboard/reports">Reports</a>
+            </li>
+            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                <button id="logout-btn">Logout</button>
+            </li>
+        </ul>
+    </nav>
+
+    <section class="expense-form" id="expense-form">
+        <form class="form-template" id="form-template" >
+            <input type="number" name="amount" placeholder="Enter Amount" required />
+            
+            <select id="Category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="salary">Salary</option>
+                <option value="food-groceries">Food & Groceries</option>
+                <option value="housing">Housing</option>
+                <option value="transportation">Transportation</option>
+                <option value="health-wellness">Health & Wellness</option>
+                <option value="utilities-bills">Utilities & Bills</option>
+                <option value="entertainment-leisure">Entertainment & Leisure</option>
+                <option value="personal-care">Personal Care</option>
+                <option value="savings-investments">Savings & Investments</option>
+                <option value="debt-payments">Debt Payments</option>
+                <option value="insurance">Insurance</option>
+                <option value="education">Education</option>
+                <option value="gifts-donations">Gifts & Donations</option>
+                <option value="taxes">Taxes</option>
+                <option value="miscellaneous">Miscellaneous</option>
+                <option value="other">Other</option>
+            </select>
+            <input type="text" name="description" placeholder="Enter Description" required />
+    
+            <select id="Type" required>
+                <option value="" disabled selected>Select Type</option>
+                <option value="Income">Income</option>
+                <option value="Expense">Expense</option>
+            </select>
+    
+            <button type="submit">Add</button>
+        </form>
+    </section>
+
+    <section>
+        <section class="transactions">
+            <h2>Today's Transactions</h2>
+            <% if (todayTransactions .length > 0) { %>
+                <% todayTransactions .forEach(transaction => { %>
+                    <div class="transaction-card">
+                        <div class="transaction-date">
+                            <strong>Date:</strong> <%= transaction.date %>
+                        </div>
+                        <div class="transaction-details">
+                            
+                            <div class="category-description">
+                                <div>
+                                <strong>Category:</strong> <%= transaction.category %> <br>
+                            </div>
+                            <div>
+                                <strong>Description:</strong> <%= transaction.description %> <br>
+                            </div>
+                        </div>
+                            <div>
+                                <strong>Amount:</strong> 
+                                <span class="amount <%= transaction.expenseType === 'expense' ? 'expense' : 'income' %>">
+                                    ₹<%= transaction.amount.toFixed(2) %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                <% })%>
+            <% } else { %>
+                <p>No transactions recorded for today.</p>
+            <% } %>
+        </section>
+    </section>
+
+   <script src="/js/expense.js"></script>  
+    
+  
+</body>
+</html>

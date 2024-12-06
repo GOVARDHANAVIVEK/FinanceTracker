@@ -1,0 +1,28 @@
+<!-- views/layouts/layout.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Link to the CSS file -->
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <ul>
+                <li><a href="/">Dashboard</a></li>
+                <!-- <li><a href="/add-entry">Add Entry</a></li>
+                <li><a href="/reports">Reports</a></li>
+                <li><a href="/settings">Settings</a></li> -->
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <%- body %> <!-- Content from individual pages will be injected here -->
+        </main>
+    </div>
+</body>
+</html>

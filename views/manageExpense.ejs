@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+       
+    <style>
+   .transaction-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.transaction-card .amount {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.transaction-card .expense {
+    color: #e74c3c;
+}
+
+.transaction-card .income {
+    color: #2ecc71;
+}
+
+.transaction-date {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.transaction-details {
+    margin-top: 8px;
+}
+
+.category, .description {
+    font-size: 1em;
+    color: #333;
+}
+
+.transaction-icons {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+.transaction-icons .icon {
+    font-size: 1.2em;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.transaction-icons .icon:hover {
+    color: #333;
+}
+
+.month-section {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.save-btn{
+    display: none;
+}
+
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                <a href="/dashboard">Dashboard</a>
+            </li>
+            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                <a href="/dashboard/add-expense">Add Expense</a>
+            </li>
+            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                <a href="/dashboard/manage-expenses">Manage Expenses</a>
+            </li>
+            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                <a href="/dashboard/reports">Reports</a>
+            </li>
+            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                <button id="logout-btn">Logout</button>
+            </li>
+        </ul>
+    </nav>
+    <section>
+        <div class="month-section">
+            <div class="month-title">
+                <strong>Month: <%= current_month %></strong>
+            </div>
+            <%if(currentMonthTransactions.length > 0) { %>
+            <% currentMonthTransactions.forEach(transaction => { %>
+                <% console.log(transaction._id )%>
+                <div class="transaction-card" id="transaction-<%= transaction._id %>">
+                    <form class="transaction-form">
+                        <div class="transaction-date">
+                            <strong>Date:</strong> <%= transaction.date %>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="category-description">
+                                <div>
+                                    <strong>Category:</strong>
+                                    <select name="category" disabled>
+                                        <% console.log('Current Category:', transaction.category); %>
+
+                                        <option value="salary" <%= (transaction.category.toLowerCase() === 'salary') ? 'selected' : '' %>>Salary</option>
+                                        <option value="savings-investments" <%= (transaction.category.toLowerCase() === 'savings-investments') || (transaction.category.toLowerCase() === 'investments/stocks') ? 'selected' : '' %>>Savings & Investments (e.g., Stocks)</option>
+                                        
+                                        <!-- Expense Categories -->
+                                        <option value="food-groceries" <%= (transaction.category.toLowerCase() === 'food' || transaction.category.toLowerCase() === 'food-groceries') ? 'selected' : '' %>>Food & Groceries</option>
+                                        <option value="housing" <%= (transaction.category.toLowerCase() === 'housing') ? 'selected' : '' %>>Housing</option>
+                                        <option value="transportation" <%= (transaction.category.toLowerCase() === 'transportation' || transaction.category.toLowerCase() === 'travel') ? 'selected' : '' %>>Transportation & Travel</option>
+                                        <option value="health-wellness" <%= (transaction.category.toLowerCase() === 'health-wellness') ? 'selected' : '' %>>Health & Wellness</option>
+                                        <option value="utilities-bills" <%= (transaction.category.toLowerCase() === 'utilities-bills') ? 'selected' : '' %>>Utilities & Bills</option>
+                                        <option value="entertainment-leisure" <%= (transaction.category.toLowerCase() === 'entertainment' || transaction.category.toLowerCase() === 'entertainment-leisure') ? 'selected' : '' %>>Entertainment & Leisure</option>
+                                        <option value="personal-care" <%= (transaction.category.toLowerCase() === 'personal' || transaction.category.toLowerCase() === 'personal-care') ? 'selected' : '' %>>Personal Care</option>
+                                        <option value="debt-payments" <%= (transaction.category.toLowerCase() === 'loans' || transaction.category.toLowerCase() === 'debt-payments') ? 'selected' : '' %>>Loans/EMI & Debt Payments</option>
+                                        <option value="insurance" <%= (transaction.category.toLowerCase() === 'insurance') ? 'selected' : '' %>>Insurance</option>
+                                        <option value="education" <%= (transaction.category.toLowerCase() === 'education') ? 'selected' : '' %>>Education</option>
+                                        <option value="gifts-donations" <%= (transaction.category.toLowerCase() === 'gifts-donations') ? 'selected' : '' %>>Gifts & Donations</option>
+                                        <option value="taxes" <%= (transaction.category.toLowerCase() === 'taxes') ? 'selected' : '' %>>Taxes</option>
+                                        <option value="miscellaneous" <%= (transaction.category.toLowerCase() === 'miscellaneous') ? 'selected' : '' %>>Miscellaneous</option>
+                                        
+                                        <!-- Other Option -->
+                                        <option value="other" <%= (transaction.category.toLowerCase() === 'other') ? 'selected' : '' %>>Other</option>
+                                    </select>
+                                    
+                                    
+                                </div>
+                                <div>
+                                    <strong>Description:</strong>
+                                    <input type="text" name="description" value="<%= transaction.description %>" disabled />
+                                </div>
+                            </div>
+                            <div>
+                                <strong>Amount:</strong>
+                                <input type="number" name="amount" step="0.01" value="<%= transaction.amount.toFixed(2) %>" disabled
+                                       class="<%= transaction.expenseType === 'expense' ? 'expense' : 'income' %>" />
+                            </div>
+                        </div>
+                        <div class="transaction-icons">
+                            <i class="icon fas fa-edit" title="Edit" onclick="toggleEdit('<%=transaction._id %>')"></i>
+                            <i class="icon fas fa-trash-alt" title="Delete" onclick="toggleDel('<%=transaction._id%>')"></i>
+                            <button type="submit" class="save-btn"  hidden>Save</button>
+                        </div>
+                    </form>
+                </div>
+            <% })%>
+            <% } else { %>
+                <p>No transactions recorded for <strong><%=current_month%></strong>.</p>
+            <% } %>
+            
+        </div>
+    </section>
+    <div id="popup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <p id="modal-message">Transaction saved successfully!</p>
+            <div class="modal-buttons">
+                <button id="yes-btn" class="modal-btn" value="yes">Yes</button>
+                <button id="no-btn" class="modal-btn" value="no">No</button>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        const popup = document.getElementById('popup-modal');
+        popup.style.display = "none"
+        
+
+        const yes_btn = document.getElementById('yes-btn').addEventListener('click', (event) => {
+    console.log(event.target.value);  // Using event.target to get the value of the clicked button
+    saveStatus(event.target.value);
+})
+
+const no_btn = document.getElementById('no-btn').addEventListener('click', (event) => {
+    console.log(event.target.value);  // Using event.target to get the value of the clicked button
+    saveStatus(event.target.value);
+})
+
+let selectedValue = '';
+
+// Function to save the status when a button is clicked
+function saveStatus(value) {
+    console.log("hiiiiiii");
+    // Store the selected value in the global variable
+    console.log("Selected Value->:", selectedValue); 
+    selectedValue = value;
+    console.log("Selected Value:", selectedValue); 
+}
+            
+        
+        const logoutBtn = document.getElementById('logout-btn').addEventListener('click',(e)=>{
+            e.preventDefault()
+            handleLogout()
+        });
+
+        function checkTokenExpiry() {
+        const token = localStorage.getItem('Access token');
+        console.log("hereeeeee")
+        console.log("token check"+token)
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+            const expiry = payload.exp * 1000; // Convert to milliseconds
+            console.log("payload "+payload)
+            if (Date.now() > expiry) {
+                alert("Session expired. Please log in again.");
+                handleLogout(); // Clear token and redirect to login
+            }
+        }else{
+            console.log("bjd")
+        }
+        }
+        function handleLogout() {
+        localStorage.removeItem('Access token');
+        history.pushState({}, '', '/');
+        window.location.href = '/'; // Redirect to login page
+        }
+    
+    function toggleEdit(id) {
+            const form = document.querySelector(`#transaction-${id} .transaction-form`);
+            const inputs = form.querySelectorAll("input");
+            const saveBtn = form.querySelector(".save-btn");
+            const options = form.querySelector('select[name=category]');
+
+            // Toggle disabled state and show save button
+            inputs.forEach(input => input.disabled = !input.disabled);
+            options.disabled = !options.disabled;
+            saveBtn.style.display = 'flex';
+
+            console.log("Toggling form for transaction ID:", id);
+
+    // Ensure the values you're logging are from the current form context
+        inputs.forEach(input => {
+            console.log(`Input ${input.name}:`, input.value);
+        });
+
+        // Make sure we only add the event listener once
+        if (!saveBtn.hasListener) {
+            saveBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+
+                // Get updated values from the current form
+                const updatedCategory = options.value;
+                const updatedDescription = form.querySelector('input[name=description]').value;
+                const updatedAmount = form.querySelector('input[name=amount]').value;
+
+                console.log("Updated values - Category:", updatedCategory, "Description:", updatedDescription, "Amount:", updatedAmount);
+
+                // Call saveTransaction with the updated values
+                await saveTransaction(id, updatedCategory, updatedDescription, updatedAmount);
+
+                // Disable inputs and hide save button after saving
+                inputs.forEach(input => input.disabled = true);
+                options.disabled = true;
+                saveBtn.style.display = 'none';
+            });
+            saveBtn.hasListener = true;  // Flag to prevent multiple listeners
+        }else{
+            inputs.forEach(input => input.disabled = true);
+            options.disabled = true;
+            saveBtn.style.display = 'none';
+            saveBtn.hasListener = false;
+        }
+}
+
+    // function toggleEdit(id) {
+    //     const form = document.querySelector(`#transaction-${id} .transaction-form`);
+    //     console.log("id ",id)
+    //     console.log(`transaction-${id}`)
+    //     const inputs = form.querySelectorAll("input");
+    //     const saveBtn = form.querySelector(".save-btn");
+    //     const options = form.querySelector('select')
+    //     // Toggle disabled state and show save button
+    //     inputs.forEach(input => input.disabled = !input.disabled);
+    //     options.disabled = !options.disabled
+    //     saveBtn.hidden = !saveBtn.hidden;
+    //     console.log(inputs.values)
+    //     inputs.forEach(input => console.log(input.name, input.value));
+    //     saveBtn.addEventListener('click',async(event)=>{
+    //         const u_category = document.querySelector('select[name=category]').value;
+    //         const u_description = document.querySelector('input[name=description]').value;
+    //         const u_amount = document.querySelector('input[name=amount]').value;
+    //         console.log("category update = ",u_category,"description updated = ",u_description,"ampunt updated =",u_amount);
+    //         event.preventDefault();
+    //         // saveTransaction(id,u_category,u_description,u_amount)
+    //     });
+    // }
+  
+    async function saveTransaction(id,category,description,amount) {
+        const token = localStorage.getItem('Access token');
+        const formData = { updated_id: id, updatedCategory: category, updatedDescription: description, updatedAmount: amount };
+        console.log(`transaction-${id}`)
+        console.log(formData)
+        const response = await fetch('/dashboard/manage-expenses',{
+            method:'PUT',
+            headers:{
+                'authorization':`Bearer ${token}`,
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(formData)
+        });
+        const data = await response.json()
+        console.log(data)
+
+
+    }
+
+
+    function showPopup(message) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById("popup-modal");
+        const modalMessage = document.getElementById("modal-message");
+        const closeButton = document.querySelector(".close-btn");
+        const yesButton = document.getElementById("yes-btn");
+        const noButton = document.getElementById("no-btn");
+
+        // Set the message
+        modalMessage.textContent = message;
+        modal.style.display = "flex";
+
+        // Close modal function
+        const closeModal = () => {
+            modal.style.display = "none";
+        };
+
+        // Handle button clicks
+        closeButton.onclick = () => {
+            closeModal();
+            resolve(false); // Treat close button as "No"
+        };
+
+        yesButton.onclick = () => {
+            closeModal();
+            resolve(true); // Resolve promise with "Yes"
+        };
+
+        noButton.onclick = () => {
+            closeModal();
+            resolve(false); // Resolve promise with "No"
+        };
+
+        // Close the modal when clicking outside
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                closeModal();
+                resolve(false); // Treat clicking outside as "No"
+            }
+        };
+    });
+}
+
+    
+// Example usage:
+async function askUser() {
+    const confirmed = await showPopup("Are you sure you want to delete this transaction?");
+    if (confirmed) {
+        return "Yes";
+    } else {
+        return "No";
+    }
+}
+function toggleDel(id){
+        askUser().then(result => {
+            console.log("result "+result)
+            if (result === "Yes") {
+                console.log("result "+result)
+                // popup.style.display = "inline"
+                console.log("selected ---->"+selectedValue)
+               if(selectedValue=="yes"){
+                console.log("result "+result)
+                    console.log("selected yes")
+                    deleteTransaction(id)
+                    popup.style.display = "none"
+               }else{
+                    popup.style.display = "none"
+               } 
+            } else {
+                console.log("User clicked No");
+                // Your code when the user clicks No
+            }
+    });
+    }
+
+async function deleteTransaction(id) {
+    const token = localStorage.getItem('Access token');
+    console.log("calling del")
+    try {
+        console.log(id)
+        const response = await fetch('/dashboard/manage-expenses', {
+        method: 'DELETE',
+        headers: {
+            'authorization': `Bearer ${token}`,  // 'Authorization' is typically capitalized
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })  // Ensure 'id' is defined and contains the necessary value
+    });
+    console.log("id----->",{ id })
+    // Handle the response
+        if (response.ok) {
+            const data = await response.json();  // Parse the response if it's successful
+            console.log('Expense deleted:', data);
+            window.location.reload();
+        } else {
+            console.error('Failed to delete expense:', response.statusText);
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!-- views/dashboard.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Personal Finance Tracker</title>
+   <!-- Correct CSS link -->
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+    /* Basic styling for each transaction card */
+    .transaction-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #ffffff;
+        box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.1);
+    }
+    .transaction-card .amount {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    .transaction-card .expense {
+        color: red;
+    }
+    .transaction-card .income {
+        color: green;
+    }
+    .transaction-date {
+        font-size: 0.9em;
+        color: #666;
+    }
+    .transaction-details {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .month-section{
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .year-section{
+        border: 1px solid #fffefe;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    #Month-value, #Year-value{
+        color: rgb(51, 42, 52);
+     }
+
+    .user{
+       
+        align-items: center;
+        justify-content: center;
+        /* border: 1px solid #f73f3f; */
+        text-align: center;
+        background-color: transparent;
+       
+        /* border: 1px solid; */
+     }
+     #name{
+        color: cadetblue;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+     }
+    .month-title{
+        display: flex;
+        justify-content: space-between;
+    }
+    .category-description{
+    display: flex;
+    justify-content: space-between;
+    width: fit-content;
+    /* border: 1px solid ; */
+    width: 40%;
+    margin: 0px 20px;
+    
+}
+.category-description div strong{
+    display: inline;
+    justify-content: space-between;
+
+}
+.arrow-icon {
+    cursor: pointer;
+    font-size: 14px;
+    padding-left: 8px;
+}
+
+.month-transactions {
+    display: block; /* Ensure it is initially visible */
+}
+
+
+
+</style>
+
+
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <ul>
+            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                <a href="/dashboard">Dashboard</a>
+            </li>
+            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                <a href="/dashboard/add-expense">Add Expense</a>
+            </li>
+            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                <a href="/dashboard/manage-expenses">Manage Expenses</a>
+            </li>
+            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                <a href="/dashboard/reports">Reports</a>
+            </li>
+            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                <button id="logout-btn">Logout</button>
+            </li>
+        </ul>
+    </nav>
+<div class="user">
+   <h1>Welcome <span id="name"><%=username%></span></h1>
+   <!-- <div class="filter-container">
+    <img id='filter' src="../public/images/setting.png" alt="">
+</div> -->
+</div>
+<section>
+    <h2>Transactions</h2>
+    <% if (Object.keys(groupedTransactions).length === 0) { %>
+        <div class="no-transactions">
+            <h3>No Transactions Found</h3>
+        </div>
+    <% } else { %>
+        <% 
+            // Sort years in descending order
+            const sortedYears = Object.keys(groupedTransactions).sort((a, b) => b - a); 
+        %>
+        
+        <% sortedYears.forEach(year => { %>
+            <section class="year-section">
+                <div class="year-title"><strong>Year: <%= year %></strong></div>
+                
+                <% 
+                    // Sort months in descending order
+                    const sortedMonths = Object.keys(groupedTransactions[year]).sort((a, b) => b - a); 
+                %>
+
+                <% sortedMonths.forEach(month => { 
+                    // Find matching monthData for current year and month
+                    const monthData = finalMonthlySummary.find(data => data._id.year == year && data._id.month == month);
+                    const income = monthData ? monthData.income : 0;
+                    const expense = monthData ? monthData.expense : 0;
+                    const balance = monthData ? monthData.balance : 0;
+                %>
+                    <div class="month-section">
+                        <div class="month-title" onclick="toggleMonthSection('<%= year %>-<%= month %>')">
+                            <div><span id="<%= year %>-<%= month %>-arrow" class="arrow-icon">▲</span><strong>Month: <%= month %></strong></div>
+                            <div class="additional-info">
+                                <strong>Income: <span class="highlight-info highlight-info-income">₹<%= income %></span></strong>
+                                <strong>Expense: <span class="highlight-info highlight-info-expense">₹<%= expense %></span></strong>
+                                <strong>Balance: <span class="highlight-info highlight-info-balance">₹<%= balance %></span></strong>
+                            </div>
+                        </div>
+                        <div id="<%= year %>-<%= month %>-details" class="month-transactions">
+                        <% groupedTransactions[year][month].forEach(transaction => { %>
+                            <div class="transaction-card">
+                                <div class="transaction-date">
+                                    <strong>Date:</strong> <%= new Date(transaction.date).toLocaleDateString() %>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="category-description">
+                                    <div>
+                                        <strong>Category:</strong> <%= transaction.category %> <br>
+                                    </div>
+                                    <div>
+                                        <strong>Description:</strong> <%= transaction.description %> <br>
+                                    </div>
+                                    </div>
+                                    <div>
+                                        <strong>Amount:</strong> 
+                                        <span class="amount <%= transaction.expenseType === 'expense' ? 'expense' : 'income' %>">
+                                            ₹<%= transaction.amount.toFixed(2) %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                    </div>
+                <% }) %>
+            </section>
+        <% }) %>
+    <% } %>
+</section>
+
+    <script>
+            const logoutBtn = document.getElementById('logout-btn').addEventListener('click',(e)=>{
+                e.preventDefault()
+                handleLogout()
+            });
+
+            function checkTokenExpiry() {
+            const token = localStorage.getItem('Access token');
+            console.log("hereeeeee")
+            console.log("token check"+token)
+            if (token) {
+                const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+                const expiry = payload.exp * 1000; // Convert to milliseconds
+                console.log("payload "+payload)
+                if (Date.now() > expiry) {
+                    alert("Session expired. Please log in again.");
+                    handleLogout(); // Clear token and redirect to login
+                }
+            }else{
+                console.log("bjd")
+            }
+            }
+            function handleLogout() {
+            localStorage.removeItem('Access token');
+            history.pushState({}, '', '/');
+            window.location.href = '/'; // Redirect to login page
+            }
+            
+        function toggleMonthSection(sectionId) {
+        const detailsElement = document.getElementById(`${sectionId}-details`);
+        const arrowElement = document.getElementById(`${sectionId}-arrow`);
+       
+        if (detailsElement.style.display === "none") {
+            detailsElement.style.display = "block"; // Expand the section
+            arrowElement.textContent = "▲"; // Change arrow to up
+        } else {
+            detailsElement.style.display = "none"; // Collapse the section
+            arrowElement.textContent = "▼"; // Change arrow to down
+        }
+    }
+
+
+    // const filter = document.getElementById('filter')
+    // filter.addEventListener('click',()=>{
+    //    console.log('filter/..')
+    // })
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                <a href="/dashboard">Dashboard</a>
+            </li>
+            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                <a href="/dashboard/add-expense">Add Expense</a>
+            </li>
+            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                <a href="/dashboard/manage-expenses">Manage Expenses</a>
+            </li>
+            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                <a href="/dashboard/reports">Reports</a>
+            </li>
+            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                <button id="logout-btn">Logout</button>
+            </li>
+        </ul>
+    </nav>
+    <div class="main">
+        <!-- Buttons for Monthly, Yearly, and Quarterly Reports -->
+        <div class="button-group">
+            <button id="monthlyBtn" >Monthly</button>
+            <button id="yearlyBtn" >Yearly</button>
+            <button id="quarterlyBtn" >Quarterly</button>
+        </div>
+    
+        <!-- Filter Settings (Year, Month) -->
+        <div class="filter-setting">
+            <div id="year-filter">
+                <label for="year">Select Year:</label>
+                <select id="year"></select>
+            </div>
+            
+            <div id="month-filter" style="display: none;">
+                <label for="month">Select Month:</label>
+                <select id="month"></select>
+            </div>
+    
+            <div id="quarter-filter" style="display: none;">
+                <label for="quarter">Select Quarter:</label>
+                <select id="quarter">
+                    <option value="Q1">Q1 (Jan-Mar)</option>
+                    <option value="Q2">Q2 (Apr-Jun)</option>
+                    <option value="Q3">Q3 (Jul-Sep)</option>
+                    <option value="Q4">Q4 (Oct-Dec)</option>
+                </select>
+            </div>
+    
+            <button id="generate">Generate</button>
+        </div>
+    
+        <!-- Report Container -->
+        <div class="report-container" id="report-container">
+            <section class="report1" >
+                <div class="title">
+                    <h2 id="IEReporttitle"></h2>
+                </div>
+                <div class="summary" >
+                    
+                    <p><strong>Total Income:</strong> <span class="total-income">0</span></p>
+                    <p><strong>Total Expense:</strong> <span class="total-expense">0</span></p>
+                    <p><strong>Net Savings:</strong> <span class="net-savings">0</span></p>
+                </div>
+
+                <div class="reportdiv" id="IEReport"></div>
+                <div class="tooltip" id="tooltip"></div>
+                
+            </section>
+            <section class="report2">
+                <!-- Container for the financial summary (total income, total expense, and net savings) -->
+                <div class="title">
+                    <h2 id="CWReporttitle"></h2>
+                </div>
+                <div class="summary" >
+                    <p><strong>Total Income:</strong> <span class="total-income">0</span></p>
+                    <p><strong>Total Expense:</strong> <span class="total-expense">0</span></p>
+                    <p><strong>Net Savings:</strong> <span class="net-savings">0</span></p>
+                </div>
+            
+                <!-- Container for the pie chart -->
+                <div class="reportdiv" id="CWReport"></div>
+            
+                <!-- Tooltip for pie chart hover functionality -->
+                <div class="tooltip" id="tooltip"></div>
+            </section>
+
+            <section class="report3">
+                <!-- Container for the financial summary (total income, total expense, and net savings) -->
+                <div class="title">
+                    <h2 id="BreakdownReporttitle"></h2>
+                </div>
+                <div class="summary" >
+                    <p><strong>Total Income:</strong> <span class="total-income">0</span></p>
+                    <p><strong>Total Expense:</strong> <span class="total-expense">0</span></p>
+                    <p><strong>Net Savings:</strong> <span class="net-savings">0</span></p>
+                </div>
+            
+                <!-- Container for the pie chart -->
+                <div class="reportdiv" id="BreakdownReport"></div>
+            
+                <!-- Tooltip for pie chart hover functionality -->
+                <div class="tooltip" id="tooltip"></div>
+            </section>
+        </div>
+    </div>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="../public/js/report.js"></script>   
+    <script>
+        const currentYear = new Date().getFullYear();
+        const startYear = 2000; // Set this to your preferred starting year
+        const yearSelect = document.getElementById('year');
+
+        for (let year = currentYear; year >= startYear; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.text = year;
+            yearSelect.appendChild(option);
+        }
+
+        let months = {
+                1: "Jan",
+                2: "Feb",
+                3: "Mar",
+                4: "Apr",
+                5: "May",
+                6: "Jun",
+                7: "Jul",
+                8: "Aug",
+                9: "Sep",
+                10: "Oct",
+                11: "Nov",
+                12: "Dec"
+            }
+        const currentMonth = new Date().getMonth()+1;
+        const monthSelect = document.getElementById('month');
+        for(let month=1;month<=12;month++){
+            const option = document.createElement('option');
+            option.value = months[month];
+            option.text = months[month];
+
+            if(month == currentMonth){
+                option.selected = true
+            }
+            monthSelect.appendChild(option);
+        
+        }
+    </script>
+</body>
+</html>

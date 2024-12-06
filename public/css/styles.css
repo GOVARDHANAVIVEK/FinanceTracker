@@ -1,0 +1,495 @@
+/* public/css/style.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(255, 255, 255);
+    color:rgb(249, 175, 110);
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+nav {
+    background-color: #333;
+    padding: 1em;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    align-items: center;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #70efc5;
+    
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+/* Highlight the active navigation item */
+nav ul li.active a {
+    font-weight: bold;
+    color: #028fd0;
+    /* text-decoration: underline; */
+    background-color: #f4ecec;
+    border-radius: 30px;
+}
+strong{
+    color:#070005;
+}
+
+.highlight-info-income{
+color: #146327;
+}
+.highlight-info-expense{
+    color: #f71717;
+}
+.highlight-info-balance{
+    color: #03b0fa;
+}
+.year-title strong{
+    color:rgb(0, 7, 13);
+    font-size: 18px;
+}
+/* Style the Logout button */
+#logout-btn {
+    background-color: #c64f4f;
+    border: none;
+    padding: 10px 15px;
+    color: rgb(254, 253, 253);
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 10px;
+    font-size: 1rem;
+}
+#logout-btn:hover{
+    background-color: #e67272;
+    color: rgb(252, 252, 252);
+}
+
+header {
+    text-align: center;
+    padding: 1.5em;
+    background-color: #5a9bd4;
+    color: #fff;
+}
+
+section {
+    margin: 1.5em;
+    padding: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+
+
+.summary p strong {
+    color: #020000;
+}
+
+.additional-info{
+    display: flex;
+    justify-content: space-between;
+    color: #c64f4f;
+    
+}
+.additional-info strong{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+.main{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    
+    /* Adjust height as needed */
+}
+
+h2{
+    color: #e67272;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: medium;
+}
+
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Make sure it appears above other content */
+}
+
+/* Modal Content */
+.modal-content {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #ff5c5c;
+}
+
+/* Modal Message */
+#modal-message {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#yes-btn {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+#yes-btn:hover {
+    background-color: #45a049;
+}
+
+#no-btn {
+    background-color: #f44336;
+    color: #fff;
+}
+
+#no-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-setting{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 10%;
+    background-color: rgb(242, 247, 249);
+    padding: 10px;
+}
+
+.filter-setting div {
+    width: 100%;
+    /* border: 1px solid black; */
+    margin: 0px 10px;
+    display: inline;
+}
+.filter-setting div select{
+    width: 75%;
+    height: 40px;
+    text-align: center;
+    background-color: #ffffff;
+    color: #d32f2f;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.2em;
+}
+
+.filter-setting div button{
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    position: relative;
+    /* right: px; */
+    /* margin-left: 90px; */
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.2em;
+    background-color: cornflowerblue;
+    color: #ffffff;
+    border: 2px solid #800080;
+    border-radius: 30px;
+    border: none;
+}
+
+.filter-setting div button:hover{
+    background: #800080;
+    color: #ffffff;
+}
+
+.bar {
+    fill: steelblue;
+}
+.bar-text {
+    fill: white;
+    font-size: 14px;
+    text-anchor: middle;
+}
+.axis-label {
+    font-size: 12px;
+}
+.tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    visibility: hidden;
+  }
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: space-around;
+    width: 100%;
+}
+.button-group button {
+    padding: 10px 20px;
+    background-color: #ce753e;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 80%;
+    margin: 5px;
+    border-radius: 30px;
+}
+#generate {
+    padding: 10px 20px;
+    background-color: #969090;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 40%;
+    border-radius: 30px;
+    align-items: center;
+
+    justify-content: center;
+}
+
+#generate:hover {
+    background-color: #0056b3;
+}
+
+.filter-setting {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: transparent;
+}
+
+
+button {background-image: linear-gradient(to right, #1FA2FF 0%, #12D8FA  51%, #1FA2FF  100%)}
+button {
+   margin: 10px;
+   padding: 15px 45px;
+   text-align: center;
+   text-transform: uppercase;
+   transition: 0.5s;
+   background-size: 200% auto;
+   color: white;            
+   box-shadow: 0 0 20px #eee;
+   border-radius: 10px;
+   display: block;
+ }
+
+ button:hover {
+   background-position: right center; /* change the direction of the change here */
+   color: #fff;
+   text-decoration: none;
+ }
+
+ 
+ .button-group button {background-image: linear-gradient(to right, #1D2B64 0%, #F8CDDA  51%, #1D2B64  100%)}
+ .button-group button {
+    margin: 10px;
+    padding: 15px 45px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;            
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .button-group button:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+  }
+ 
+
+  .tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    visibility: hidden;
+}
+
+
+
+/*reports */
+
+/* Report Container */
+/* Main Container */
+.report-container {
+    /* display: grid; */
+    /* grid-template-columns: 1fr 1fr; Creates a 2-column layout */
+    gap: 20px; /* Space between grid items */
+    padding: 20px;
+    background-color: transparent; /* Subtle background color for contrast */
+    border-radius: 10px;
+    /* border: 1px solid; */
+    /* justify-content: center; */
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+  
+  .report1, .report2, .report3 {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    width: 500px;
+  }
+  
+  .summary {
+    background-color: #f9fafc;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .summary p {
+    font-size: 18px;
+    color: #333;
+    margin: 5px 0;
+    font-weight: 500;
+  }
+  /* Style the first paragraph (Total Income) */
+.summary p:nth-child(1) {
+    color: #5ed3f7;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Style the second paragraph (Total Expense) */
+.summary p:nth-child(2) {
+    color: #d9534f;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Style the third paragraph (Net Savings) */
+.summary p:nth-child(3) {
+    color: #5cb85c;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+ 
+  
+  #total-income, #total-expense, #net-savings {
+    color: #007bff;  /* Emphasize values with color */
+    font-weight: bold;
+  }
+  
+  .reportdiv {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .tooltip {
+    visibility: hidden;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  
+  .tooltip.show {
+    visibility: visible;
+  }
+  
+  #IEReport, #CWReport, #IEReport2, #IEReport3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    
+  }
+  
+.axis-label {
+font-size: 12px;
+color: #555;
+}
+.report-container{
+    display: none;
+}
+
+.transaction-icons .save-btn{
+    display: "none";
+}
+
