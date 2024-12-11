@@ -21,9 +21,9 @@ app.use('/public', express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(cors({
-    origin: 'https://financetracker-jlmk.onrender.com'
-  }));
+// app.use(cors({
+//     origin: 'https://financetracker-jlmk.onrender.com'
+//   }));
 app.use(session({
     secret: process.env.JWT_secret || 'yourSecretKey', // Make sure to replace with a strong key
     resave: false,

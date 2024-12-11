@@ -131,13 +131,20 @@ function populateYearDropdown() {
 
 generate.style.display="none"
 generate.addEventListener('click',(e)=>{
+  console.log("reportType+"+reportType)
   if(reportType == "Monthly"){
+
     IEReporttitle.textContent = "Monthly Income & Expense Report";
     CWReporttitle.textContent = "Monthly Expense Breakdown by Category";
-  }else if("yearly"){
+  }else if(reportType =="Yearly"){
+
     IEReporttitle.textContent = "Yearly Income & Expense Report";
     CWReporttitle.textContent = "Yearly Expense Breakdown by Category";
     BreakdownReporttitle.textContent = "Year - Month Breakdown Income & Expense Report"
+  }else if(reportType =="Quarterly"){
+
+    IEReporttitle.textContent = "Quarterly Income & Expense Report";
+    CWReporttitle.textContent = "Quarterly Expense Breakdown by Category";
   }
   // e.preventDefault();
   
@@ -348,8 +355,10 @@ function PrintIncomeExpenseReport(InputData) {
   ];
   console.log(data);
 
-  const width = 500, height = 300;
-  const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+  
+  const width = 500; // Full container width
+  const height = width * 0.6;
+  const  margin = { top: 20, right: 20, bottom: 40, left: 110 };
 
   // Clear any existing SVG content before creating new one
   d3.select(IEReport).select("svg").remove();
@@ -378,9 +387,9 @@ function PrintIncomeExpenseReport(InputData) {
     .enter()
     .append("rect")
     .attr("class", "bar")
-    .attr("x", d => xScale(d.label))
+    .attr("x", d => xScale(d.label) + (xScale.bandwidth() * 0.25)) // Adjust x position to center the narrower bars
     .attr("y", d => yScale(d.value))
-    .attr("width", xScale.bandwidth())
+    .attr("width", xScale.bandwidth() * 0.3) // Reduce the width to 50% of the bandwidth
     .attr("height", d => height - margin.bottom - yScale(d.value))
     .attr("fill", "#69b3a2");
 
@@ -541,8 +550,9 @@ function PrintYearlyIncomeExpenseReport(InputData) {
   ];
   console.log(data);
 
-  const width = 500, height = 300;
-  const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+  const width = 500; // Full container width
+  const height = width * 0.6;
+  const  margin = { top: 20, right: 20, bottom: 40, left: 110 };
 
   // Clear any existing SVG content before creating new one
   d3.select(IEReport).select("svg").remove();
@@ -571,9 +581,9 @@ function PrintYearlyIncomeExpenseReport(InputData) {
     .enter()
     .append("rect")
     .attr("class", "bar")
-    .attr("x", d => xScale(d.label))
+    .attr("x", d => xScale(d.label) + (xScale.bandwidth() * 0.25)) // Adjust x position to center the narrower bars
     .attr("y", d => yScale(d.value))
-    .attr("width", xScale.bandwidth())
+    .attr("width", xScale.bandwidth() * 0.3) // Reduce the width to 50% of the bandwidth
     .attr("height", d => height - margin.bottom - yScale(d.value))
     .attr("fill", "#69b3a2");
 
@@ -720,8 +730,9 @@ async function PrintQuarterlyIncomeExpenseReport(InputData) {
   ];
   console.log(data);
 
-  const width = 500, height = 300;
-  const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+  const width = 500; // Full container width
+  const height = width * 0.6;
+  const  margin = { top: 20, right: 20, bottom: 40, left: 110 };
 
   // Clear any existing SVG content before creating new one
   d3.select(IEReport).select("svg").remove();
@@ -750,9 +761,9 @@ async function PrintQuarterlyIncomeExpenseReport(InputData) {
     .enter()
     .append("rect")
     .attr("class", "bar")
-    .attr("x", d => xScale(d.label))
+    .attr("x", d => xScale(d.label) + (xScale.bandwidth() * 0.25)) // Adjust x position to center the narrower bars
     .attr("y", d => yScale(d.value))
-    .attr("width", xScale.bandwidth())
+    .attr("width", xScale.bandwidth() * 0.3) // Reduce the width to 50% of the bandwidth
     .attr("height", d => height - margin.bottom - yScale(d.value))
     .attr("fill", "#69b3a2");
 
@@ -908,7 +919,7 @@ const chartData = months.map(month => ({
 
 // SVG dimensions
 const width = 400, height = 400;
-const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+const margin = { top: 20, right: 30, bottom: 50, left: 110 };
 
 // Clear any existing SVG content
 d3.select(BreakdownReport).select("svg").remove();

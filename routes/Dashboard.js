@@ -249,7 +249,7 @@ router.get('/add-expense', async (req, res) => {
     try {
         const userId = req.session.user.userId;
         const today = formatDate(new Date());
-        console.log(today)
+        console.log("today:"+today)
         const todayTransactions = await Expense.find({
             userId: userId,
             date: today
@@ -272,7 +272,7 @@ router.get('/manage-expenses', async (req, res) => {
         month: current_month
     });
     console.log("this user current month transaction   ", currentMonthTransactions)
-    res.render('manageExpense', { activePage: 'manage-expense', current_month, currentMonthTransactions })
+    res.render('manageExpense', { activePage: 'manage-expenses', current_month, currentMonthTransactions })
 });
 router.put('/manage-expenses', async (req, res) => {
     try {

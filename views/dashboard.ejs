@@ -8,8 +8,7 @@
    <!-- Correct CSS link -->
 <link rel="stylesheet" href="/css/styles.css">
 <style>
-    /* Basic styling for each transaction card */
-    .transaction-card {
+.transaction-card {
         border: 1px solid #ddd;
         border-radius: 8px;
         padding: 16px;
@@ -17,88 +16,239 @@
         background-color: #ffffff;
         box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.1);
     }
-    .transaction-card .amount {
-        font-size: 1.2em;
-        font-weight: bold;
-    }
-    .transaction-card .expense {
-        color: red;
-    }
-    .transaction-card .income {
-        color: green;
-    }
-    .transaction-date {
-        font-size: 0.9em;
-        color: #666;
-    }
-    .transaction-details {
+
+/* Amount Styling */
+.transaction-card .amount {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-left: auto; /* Pushes amount to the far right */
+    text-align: right;
+    color: #2ecc71; /* Default color for income */
+    min-width: 100px; /* Ensures minimum width for the amount */
+}
+.transaction-card .expense {
+    color: #e74c3c;
+}
+
+.transaction-card .income {
+    color: #2ecc71;
+}
+
+/* Date Styling */
+.transaction-date {
+    font-size: 14px;
+    color: #666;
+    flex: 1; /* Allows it to grow/shrink */
+    min-width: 120px; /* Ensures minimum space for date */
+}
+
+/* Transaction Details */
+.transaction-details {
         margin-top: 8px;
         display: flex;
         justify-content: space-between;
     }
-    .month-section{
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 16px;
-        margin: 8px 0;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+/* Styling for Category and Description */
+.category-description {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    color: #333;
+}
+
+.category-description div strong {
+    font-weight: bold;
+    color: #444;
+}
+
+/* Month and Year Sections */
+.month-section,
+.year-section {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#Month-value,
+#Year-value {
+    color: rgb(51, 42, 52);
+    font-weight: bold;
+}
+
+/* User Section */
+.user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: transparent;
+}
+
+#name {
+    color: cadetblue;
+    font-size: 1em;
+    font-weight: bold;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+/* Month Title Styling */
+.month-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Arrow Icon for Toggles */
+.arrow-icon {
+    cursor: pointer;
+    font-size: 16px;
+    padding-left: 8px;
+}
+
+/* Responsive Layout for Month Transactions */
+.month-transactions {
+    display: block;
+    transition: all 0.3s ease-in-out;
+}
+
+@media only screen and (max-width: 480px){
+    .transaction-card .amount {
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 8px;
     }
-    .year-section{
-        border: 1px solid #fffefe;
+    .transaction-details {
+        display: block;
+        
+    }
+    .additional-info {
+        display: flex;
+        color: #c64f4f;
+        font-size: smaller;
+        display: flex;
+        margin: 1px 1px;
+        flex-direction: column;
+        align-content: flex-start;
+        justify-content: space-between;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+    .transaction-card {
+        /* border: 1px solid #ddd; */
         border-radius: 8px;
         padding: 16px;
         margin: 8px 0;
         background-color: #ffffff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-    #Month-value, #Year-value{
-        color: rgb(51, 42, 52);
-     }
-
-    .user{
-       
-        align-items: center;
-        justify-content: center;
-        /* border: 1px solid #f73f3f; */
-        text-align: center;
-        background-color: transparent;
-       
-        /* border: 1px solid; */
-     }
-     #name{
-        color: cadetblue;
-        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
-     }
-    .month-title{
-        display: flex;
-        justify-content: space-between;
+        box-shadow: 0px -12px 16px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
     }
-    .category-description{
-    display: flex;
-    justify-content: space-between;
-    width: fit-content;
-    /* border: 1px solid ; */
-    width: 40%;
-    margin: 0px 20px;
-    
-}
-.category-description div strong{
-    display: inline;
-    justify-content: space-between;
+    .month-section, .year-section {
+        /* border: 1px solid #ddd; */
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        /* background-color: #f9f9f9; */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .transaction-date {
+        font-size: 14px;
+        color: plum;
+    }
 
-}
-.arrow-icon {
-    cursor: pointer;
-    font-size: 14px;
-    padding-left: 8px;
-}
+    .amount {
+        font-size: 1.2em;
+    }
 
-.month-transactions {
-    display: block; /* Ensure it is initially visible */
+    .category-description {
+        font-size: 13px;
+    }
+    .transaction-card .amount {
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+
+    .month-title {
+        font-size: 14px;
+    }
+
+    #name {
+        font-size: 20px;
+    }
 }
+@media only screen and (max-width: 767px) and (min-width: 480px) {
+    .transaction-card .amount {
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+    .transaction-details {
+        display: block;
+        
+    }
+    .additional-info {
+        display: flex;
+        color: #c64f4f;
+        font-size: smaller;
+        display: flex;
+        margin: 1px 1px;
+        flex-direction: column;
+        align-content: flex-start;
+        justify-content: space-between;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+    .transaction-card {
+        /* border: 1px solid #ddd; */
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        background-color: #ffffff;
+        box-shadow: 0px -12px 16px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+    .month-section, .year-section {
+        /* border: 1px solid #ddd; */
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+        /* background-color: #f9f9f9; */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .transaction-date {
+        font-size: 14px;
+        color: plum;
+    }
 
+    .amount {
+        font-size: 1.2em;
+    }
 
+    .category-description {
+        font-size: 16px;
+    }
+    .transaction-card .amount {
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+
+    .month-title {
+        font-size: 14px;
+    }
+
+    #name {
+        font-size: 20px;
+    }
+}
 
 </style>
 
@@ -107,24 +257,33 @@
 <body>
     <!-- Navigation Bar -->
     <nav>
-        <ul>
-            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
-                <a href="/dashboard">Dashboard</a>
-            </li>
-            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
-                <a href="/dashboard/add-expense">Add Expense</a>
-            </li>
-            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
-                <a href="/dashboard/manage-expenses">Manage Expenses</a>
-            </li>
-            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
-                <a href="/dashboard/reports">Reports</a>
-            </li>
-            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
-                <button id="logout-btn">Logout</button>
-            </li>
-        </ul>
+        <div class="container" onclick="myFunction(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+        <div class="Navbar">
+            <ul id="nav-menu">
+                <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                    <a href="/dashboard/add-expense">Add Expense</a>
+                </li>
+                <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                    <a href="/dashboard/manage-expenses">Manage Expenses</a>
+                </li>
+                <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                    <a href="/dashboard/reports">Reports</a>
+                </li>
+                <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                    <button id="logout-btn">Logout</button>
+                </li>
+            </ul>
+        </div>
     </nav>
+    
+    
 <div class="user">
    <h1>Welcome <span id="name"><%=username%></span></h1>
    <!-- <div class="filter-container">
@@ -199,7 +358,7 @@
         <% }) %>
     <% } %>
 </section>
-
+    <script src="../public/js/nav.js"></script>
     <script>
             const logoutBtn = document.getElementById('logout-btn').addEventListener('click',(e)=>{
                 e.preventDefault()
@@ -240,6 +399,8 @@
             arrowElement.textContent = "▼"; // Change arrow to down
         }
     }
+    
+
 
 
     // const filter = document.getElementById('filter')

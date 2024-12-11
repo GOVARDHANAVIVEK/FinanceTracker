@@ -6,25 +6,96 @@
     <title>Document</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
+<style>
+    @media only screen and (max-width: 815px) and (min-width: 480px) {
+        .button-group {
+            display: block;
+        }
+        .filter-setting div select{
+        width: 100%;
+    }
+    .filter-setting {
+        display: inline-flex;
+        /* justify-content: flex-start; */
+        align-items: center;
+        height: 10%;
+        /* background-color: rgb(242, 247, 249); */
+        /* padding: 10px; */
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-content: center;
+        /* margin-bottom: 80px; */
+        margin-bottom: 0px;
+        width: 100%;
+        justify-content: center;
+    }
+        .chart-container canvas {
+        max-width: 100%; /* Adjust for very small screens */
+    }
+    h2 {
+            text-align: center;
+    }
+    #CWReport{
+        width: 250px;
+
+    }
+    }
+    @media only screen and (min-width: 300px) and (max-width: 480px){
+        .button-group {
+            display: block;
+        }
+        .chart-container canvas {
+        max-width: 100%; /* Adjust for very small screens */
+    }
+    .filter-setting div select{
+        width: 80%;
+    }
+    .filter-setting {
+        display: inline-flex;
+        /* justify-content: flex-start; */
+        align-items: center;
+        height: 10%;
+        /* background-color: rgb(242, 247, 249); */
+        /* padding: 10px; */
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-content: center;
+        /* margin-bottom: 80px; */
+        margin-bottom: 0px;
+        width: 100%;
+        justify-content: center;
+    }
+        h2 {
+            text-align: center;
+    }
+    }
+</style>
 <body>
     <nav>
-        <ul>
-            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
-                <a href="/dashboard">Dashboard</a>
-            </li>
-            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
-                <a href="/dashboard/add-expense">Add Expense</a>
-            </li>
-            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
-                <a href="/dashboard/manage-expenses">Manage Expenses</a>
-            </li>
-            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
-                <a href="/dashboard/reports">Reports</a>
-            </li>
-            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
-                <button id="logout-btn">Logout</button>
-            </li>
-        </ul>
+        <div class="container" onclick="myFunction(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+        <div class="Navbar">
+            <ul id="nav-menu">
+                <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                    <a href="/dashboard/add-expense">Add Expense</a>
+                </li>
+                <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                    <a href="/dashboard/manage-expenses">Manage Expenses</a>
+                </li>
+                <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                    <a href="/dashboard/reports">Reports</a>
+                </li>
+                <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                    <button id="logout-btn">Logout</button>
+                </li>
+            </ul>
+        </div>
     </nav>
     <div class="main">
         <!-- Buttons for Monthly, Yearly, and Quarterly Reports -->
@@ -115,7 +186,7 @@
     </div>
     
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
+    <script src="../public/js/nav.js"></script>
     <script src="../public/js/report.js"></script>   
     <script>
         const currentYear = new Date().getFullYear();

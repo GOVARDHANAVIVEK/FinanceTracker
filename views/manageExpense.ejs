@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
        
-    <style>
-   .transaction-card {
+<style>
+   /* Transaction Card General Styles */
+.transaction-card {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 16px;
@@ -16,6 +17,13 @@
     background-color: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
+    display: flex;
+    flex-direction: column; /* Ensure content stacks naturally */
+    transition: box-shadow 0.3s ease;
+}
+
+.transaction-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Subtle hover effect */
 }
 
 .transaction-card .amount {
@@ -34,6 +42,7 @@
 .transaction-date {
     font-size: 0.9em;
     color: #666;
+    margin-top: 4px;
 }
 
 .transaction-details {
@@ -45,6 +54,7 @@
     color: #333;
 }
 
+/* Transaction Icons */
 .transaction-icons {
     position: absolute;
     top: 16px;
@@ -64,6 +74,7 @@
     color: #333;
 }
 
+/* Month Section */
 .month-section {
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -72,31 +83,131 @@
     background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.save-btn{
+
+/* Save Button */
+.save-btn {
     display: none;
 }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .transaction-card {
+        padding: 12px;
+        flex-direction: column;
+    }
+
+    .transaction-icons {
+        top: 12px;
+        right: 12px;
+    }
+
+    .transaction-card .amount {
+        font-size: 1.1em;
+    }
+
+    .transaction-date {
+        font-size: 0.8em;
+    }
+
+    .category, .description {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .transaction-card {
+        padding: 10px;
+        margin: 8px 0;
+    }
+
+    .transaction-card .amount {
+        font-size: 1em;
+    }
+
+    .transaction-date {
+        font-size: 0.75em;
+    }
+
+    .transaction-icons {
+        font-size: 1em;
+    }
+    button {
+    margin: 0px;
+    padding: 2px 5px;
+    text-align: center;
+    /* text-transform: uppercase; */
+    transition: 0.5s;
+    background-size: auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+}
+strong{
+    color:#070005;
+    font-size: 14px;
+}
+}
+
+@media (max-width: 320px) {
+    .transaction-card {
+        padding: 8px;
+        margin: 5px 0;
+    }
+
+    .transaction-card .amount {
+        font-size: 0.9em;
+    }
+
+    .transaction-date {
+        font-size: 0.7em;
+    }
+
+    .category, .description {
+        font-size: 0.8em;
+    }
+
+    .transaction-icons {
+        top: 8px;
+        right: 8px;
+        gap: 5px;
+    }
+
+    .transaction-icons .icon {
+        font-size: 1em;
+    }
+   
+}
+
 
     </style>
 </head>
 <body>
     <nav>
-        <ul>
-            <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
-                <a href="/dashboard">Dashboard</a>
-            </li>
-            <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
-                <a href="/dashboard/add-expense">Add Expense</a>
-            </li>
-            <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
-                <a href="/dashboard/manage-expenses">Manage Expenses</a>
-            </li>
-            <li class="<%= activePage === 'reports' ? 'active' : '' %>">
-                <a href="/dashboard/reports">Reports</a>
-            </li>
-            <li class="<%= activePage === 'logout' ? 'active' : '' %>">
-                <button id="logout-btn">Logout</button>
-            </li>
-        </ul>
+        <div class="container" onclick="myFunction(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+        <div class="Navbar">
+            <ul id="nav-menu">
+                <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <li class="<%= activePage === 'add-expense' ? 'active' : '' %>">
+                    <a href="/dashboard/add-expense">Add Expense</a>
+                </li>
+                <li class="<%= activePage === 'manage-expenses' ? 'active' : '' %>">
+                    <a href="/dashboard/manage-expenses">Manage Expenses</a>
+                </li>
+                <li class="<%= activePage === 'reports' ? 'active' : '' %>">
+                    <a href="/dashboard/reports">Reports</a>
+                </li>
+                <li class="<%= activePage === 'logout' ? 'active' : '' %>">
+                    <button id="logout-btn">Logout</button>
+                </li>
+            </ul>
+        </div>
     </nav>
     <section>
         <div class="month-section">
@@ -178,6 +289,7 @@
             </div>
         </div>
     </div>
+    <script src="../public/js/nav.js"></script>
     <script>
         const popup = document.getElementById('popup-modal');
         popup.style.display = "none"
