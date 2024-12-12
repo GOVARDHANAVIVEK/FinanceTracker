@@ -127,7 +127,7 @@ router.get('/', async (req, res) => {
         }
         // Find transactions based on the built query
 
-
+        
         if (transactions.length == 0) {
             console.log("here")
             res.render('dashboard', { groupedTransactions, message: "No transactions found", username, activePage: 'dashboard', finalMonthlySummary });
@@ -255,7 +255,9 @@ router.get('/add-expense', async (req, res) => {
             date: today
         });
         console.log("this user transaction today  ", todayTransactions)
-
+        todayTransactions.reverse();
+        console.log(todayTransactions)
+        // console.log(todayTransactions)
         res.render('addExpense', { activePage: 'add-expense', todayTransactions })
     } catch (error) {
         res.status(500).send({ message: error })

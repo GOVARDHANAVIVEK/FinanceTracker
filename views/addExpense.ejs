@@ -225,6 +225,76 @@
             padding: 8px;
         }
     }
+    /* Popup Styles */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    /* padding: 20px; */
+}
+
+.popup.hidden {
+    display: none;
+}
+.popup.active {
+    display: flex;
+}
+
+.popup-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    /* left: 50%; */
+    /* top: 50%; */
+    /* transform: translate(-50%, -50%); */
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    /* margin: 10%; */
+}
+
+.popup-content p {
+    font-size: 24px;
+    /* margin-bottom: 20px; */
+    /* position: absolute; */
+    /* left: 50%; */
+    /* top: 50%; */
+    /* transform: translate(-50%, -50%); */
+}
+
+.popup-content button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    justify-content: center;
+    width: fit-content;
+    /* position: absolute; */
+    /* left: 50%; */
+    /* top: 50%; */
+    /* transform: translate(-50%, -50%); */
+}
+
+.popup-content button:hover {
+    background-color: #0056b3;
+}
+
 </style>
 
 
@@ -293,7 +363,13 @@
             <button type="submit">Add</button>
         </form>
     </section>
-
+    <div id="popup" class="popup hidden">
+        <div class="popup-content">
+            <p>Transaction saved</p>
+            <button onclick="closePopup()">OK</button>
+        </div>
+    </div>
+    
     <section>
         <section class="transactions">
             <h2>Today's Transactions</h2>
@@ -326,8 +402,9 @@
                 <p>No transactions recorded for today.</p>
             <% } %>
         </section>
+    
     </section>
-
+   
    <script src="/js/expense.js"></script>  
    <script src="/js/nav.js"></script>
   

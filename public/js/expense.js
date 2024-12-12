@@ -22,7 +22,13 @@ document.getElementById('expense-form').addEventListener('submit', async (e) =>{
         const result = await response.json();
         if (response.ok) {
             console.log(result)
-            alert(result.message);
+            // alert(result.message);
+            showPopup()
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+                      
+            
             // Optionally, reload the page or reset the form
             document.getElementById('form-template').reset();
         } else {
@@ -41,7 +47,7 @@ const logoutBtn = document.getElementById('logout-btn').addEventListener('click'
 
 function checkTokenExpiry() {
 const token = localStorage.getItem('Access token');
-console.log("hereeeeee")
+
 console.log("token check"+token)
 if (token) {
     const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
@@ -69,3 +75,16 @@ const formatDate = (date) => {
     return String(`${day}-${month}-${year}`);
 };
 
+function showPopup() {
+    const popup = document.getElementById('popup');
+    popup.classList.add('active');
+}
+
+function closePopup() {
+    const popup = document.getElementById('popup');
+    popup.classList.remove('active');
+}
+
+// Example usage
+// Automatically show the popup when a transaction is saved
+// Adjust timing if needed
