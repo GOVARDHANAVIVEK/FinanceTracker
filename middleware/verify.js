@@ -16,3 +16,5 @@ const verifyToken = (req, res, next) => {
         res.status(401).send("Invalid token");
     }
 };
+
+module.exports = verifyToken

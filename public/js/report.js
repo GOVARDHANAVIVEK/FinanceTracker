@@ -2,6 +2,10 @@ const logoutBtn = document.getElementById('logout-btn').addEventListener('click'
     e.preventDefault()
     handleLogout()
 });
+
+import { schedule } from 'node-cron';
+
+
 function checkTokenExpiry() {
     const token = localStorage.getItem('Access token');
     console.log("hereeeeee")
@@ -180,6 +184,8 @@ async function getRecords(reportType){
         if(data && data.categoryWiseReport.length>0){
           IEReport.innerHTML =''
           PrintIncomeExpenseReport(data?.expenseIncomeReport)
+          
+
           
         }else{
           IEReport.innerHTML="No data found"
@@ -1033,3 +1039,5 @@ const legend = svg.append("g")
 });
 
 }
+
+

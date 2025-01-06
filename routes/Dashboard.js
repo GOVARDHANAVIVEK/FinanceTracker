@@ -6,27 +6,42 @@ const jwt = require('jsonwebtoken');
 const currentDate = new Date();
 const mongoose = require('mongoose');
 const internal = require('stream');
+const transporter = require('../middleware/nodemailer')
+const cron = require('node-cron')
+const {notifyUser} = require('../middleware/events')
 const { use } = require('bcrypt/promises');
-
+let userid = ""
 const verifyToken = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1]; // Get token from Authorization header
 
     if (!token) {
-        return res.status(403).json({ message: 'No token provided' });
+        return res.status(403).send({ message: 'No token provided' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_secret);
         console.log(decoded)
-        req.userId = decoded.userId; // Assuming userId is part of the payload
+        req.userId = decoded.userId;
+        userid = req.userId
+        req.email = decoded.email // Assuming userId is part of the payload
         next();
     } catch (error) {
         return res.status(401).json({ message: 'Invalid or expired token' });
     }
 };
-router.get('/', async (req, res) => {
+router.get('/',async (req, res) => {
+    if (!req.session || !req.session.user) {
+        console.log("Session not found or user is not logged in.");
+        // Redirect to login page if session is invalid
+        return res.redirect('/');
+    }
     let finalMonthlySummary = [];
     try {
+        if (!req.session || !req.session.user) {
+            console.log("Session not found or user is not logged in.");
+            // Redirect to login page if session is invalid
+            return res.redirect('/');
+        }
         const userId = req.session.user.userId // Assume verifyToken middleware sets req.userId
         console.log(userId)
         const user = await User.findById(userId);
@@ -148,9 +163,9 @@ router.post('/', verifyToken, (req, res) => {
         req.session.user = {}; // Initialize `req.session.user` if it doesn’t exist
     }
     req.session.user.userId = req.userId;
-
+    req.session.user.useremail = req.email;
     // req.session.user.username = req.user.Username;
-    // console.log(req)
+    console.log(req.session.user)
     // Set the username from the `req.user` token data
     // req.session.user.username = req.user.Username;
 
@@ -174,8 +189,18 @@ const months_literals = {
     12: "Dec"
 }
 const getMonth = (month) => {
-    console.log(months_literals[month])
-    return months_literals[month]
+    const monthNumber = parseInt(month, 10); // Convert to a number
+    console.log("month=====" + months_literals[monthNumber]);
+    return months_literals[monthNumber];
+}
+const getEmail =async()=>{
+    
+    const user = await User.findById(userid)
+    if(!user){
+        return null
+    }
+    console.log(user.Email)
+    return user.Email;
 }
 
 router.post('/add-expense', verifyToken, async (req, res) => {
@@ -185,7 +210,7 @@ router.post('/add-expense', verifyToken, async (req, res) => {
     try {
         const { Year, Month, Amount, Category, ExpenseType, Description } = req.body
         const userId = req.session.user.userId;
-        console.log(req.session.user.userId)
+        console.log("email=="+req.session.user.useremail)
 
         console.log(userId)
         // console.log(userId)
@@ -193,6 +218,7 @@ router.post('/add-expense', verifyToken, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        req.session.user.useremail = user.Email;
         const newExpense = new Expense({
             userId: userId,
             year: Year || currentDate.getFullYear(),
@@ -216,8 +242,10 @@ router.post('/add-expense', verifyToken, async (req, res) => {
                 userId: userId,
                 expenseType: "expense"
             });
-
-
+            
+            notifyUser.emit('transactionCreated', newExpense, user.Email);
+            
+            
             // If you want to calculate the total amounts:
             totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
             totalExpense = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -236,7 +264,37 @@ router.post('/add-expense', verifyToken, async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 
-})
+});
+
+notifyUser.on('transactionCreated',(expense,email)=>{
+    console.log('New transaction created:', expense);
+    console.log('User email:', email);
+    const mailOptions = {
+        to: email,
+        from: 'govardhanavivek32@gmail.com',
+        subject: 'New Transaction Added',
+        text: `Dear user,\n\n
+
+                You have added a new transaction today:\n\n
+                Amount : ${expense.amount}\n
+                Description : ${expense.description}\n
+                Category : ${expense.category}\n
+                Date : ${expense.date}\n
+                Transaction Type : ${expense.expenseType}`
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+        if (err) return res.send({message:'Error sending email.'+err});
+        console.log('transaction sent to mail successfully')
+    });
+});
+
+const getUserId=(req)=>{
+    console.log(req.session.user.userId)
+    return req.session.user.userId
+}
+
+
 const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
@@ -245,8 +303,13 @@ const formatDate = (date) => {
     return `${day}-${month}-${year}`;
 };
 
-router.get('/add-expense', async (req, res) => {
+router.get('/add-expense',async (req, res) => {
     try {
+        if (!req.session || !req.session.user) {
+            console.log("Session not found or user is not logged in.");
+            // Redirect to login page if session is invalid
+            return res.redirect('/');
+        }
         const userId = req.session.user.userId;
         const today = formatDate(new Date());
         console.log("today:"+today)
@@ -264,24 +327,57 @@ router.get('/add-expense', async (req, res) => {
     }
 
 })
-router.get('/manage-expenses', async (req, res) => {
+router.get('/manage-expenses',async (req, res) => {
+    try {
+        if (!req.session || !req.session.user) {
+            console.log("Session not found or user is not logged in.");
+            // Redirect to login page if session is invalid
+            return res.redirect('/');
+        }
+        console.log(req.session.user)
+        const userId = req.session.user.userId;
+        console.log(userId)
+        
+        const currentMonthNumber = String(currentDate.getMonth() + 1).padStart(2, '0');
+        console.log("Current Month Number:", currentMonthNumber);
 
-    const userId = req.session.user.userId;
-    const current_month = getMonth(String(currentDate.getMonth() + 1).padStart(2, '0'))
-    console.log(current_month, userId)
-    const currentMonthTransactions = await Expense.find({
-        userId: userId,
-        month: current_month
-    });
-    console.log("this user current month transaction   ", currentMonthTransactions)
-    res.render('manageExpense', { activePage: 'manage-expenses', current_month, currentMonthTransactions })
+        const current_month = getMonth(currentMonthNumber);
+        console.log("Current Month Name:", current_month, "User ID:", userId);
+
+        const currentMonthTransactions = await Expense.find({
+            userId: userId,
+            month: current_month,
+        });
+        console.log("Current Month Transactions:", currentMonthTransactions);
+
+        res.render('manageExpense', {
+            activePage: 'manage-expenses',
+            current_month,
+            currentMonthTransactions,
+        });
+    } catch (error) {
+        console.error("Error in manage-expenses route:", error);
+        res.status(500).send("Server Error");
+    }
+
+    // const userId = req.session.user.userId;
+    // const current_month = getMonth(String(currentDate.getMonth() + 1).padStart(2, '0'))
+    // console.log("current month =="+current_month, userId)
+    // const currentMonthTransactions = await Expense.find({
+    //     userId: userId,
+    //     month: current_month
+    // });
+    // console.log("this user current month transaction   ", currentMonthTransactions)
+    // res.render('manageExpense', { activePage: 'manage-expenses', current_month, currentMonthTransactions })
 });
-router.put('/manage-expenses', async (req, res) => {
+router.put('/manage-expenses', verifyToken,async (req, res) => {
     try {
         const { updated_id, updatedCategory, updatedDescription, updatedAmount } = req.body;
         console.log("id modified" + updated_id)
         const transaction = await Expense.findById(updated_id);
         console.log("transaction found = " + transaction)
+        const originalTransaction = JSON.stringify({ ...transaction.toObject() });
+        // console.log("original transaction found = " + originalTransaction)
         if (!transaction) {
             return res.status(404).json({ message: "Transaction not found" });
         }
@@ -293,6 +389,14 @@ router.put('/manage-expenses', async (req, res) => {
 
         // Save the updated transaction
         await transaction.save();
+        getEmail(req,res).then(email => {
+            console.log("originalTransaction+++++++"+originalTransaction)
+            console.log("Transaction+++++++"+transaction)
+            notifyUser.emit('TransactionUpdated',JSON.parse(originalTransaction),transaction,email)
+        }).catch(err => {
+            console.error("Error fetching email:", err);
+        });
+        
         res.status(200).json({ message: "Transaction updated successfully", transaction });
     } catch (error) {
         // Handle any errors
@@ -300,7 +404,45 @@ router.put('/manage-expenses', async (req, res) => {
     }
 });
 
-router.delete('/manage-expenses', async (req, res) => {
+notifyUser.on('TransactionUpdated',(originalTransaction,transaction,email)=>{
+    console.log("transaction="+transaction)
+    console.log("email="+email)
+    console.log("original+"+originalTransaction)
+    const mailOptions = {
+        to: email,
+        from: 'govardhanavivek32@gmail.com',
+        subject: 'Transaction Updated',
+        text: `
+            Dear user,\n\n
+
+                You have made a update in your transaction:\n\n
+
+                Original Transaction:\n
+                Amount: ${originalTransaction["amount"]}\n
+                Description : ${originalTransaction["description"]}\n
+                Category : ${originalTransaction["category"]}\n
+                Date : ${originalTransaction["date"]}\n
+                Transaction Type : ${originalTransaction["expenseType"]}\n\n
+
+                Updated Transaction:\n
+                Amount : ${transaction.amount}\n
+                Description : ${transaction.description}\n
+                Category : ${transaction.category}\n
+                Date : ${transaction.date}\n
+                Transaction Type : ${transaction.expenseType}\n\n
+                
+                
+            Thank You.`
+
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+        if (err) return res.send({message:'Error sending email.'+err});
+        console.log('transaction sent to mail successfully')
+    });
+})
+
+router.delete('/manage-expenses',verifyToken, async (req, res) => {
     console.log("helllo dear")
     try {
         const { id } = req.body;
@@ -310,18 +452,56 @@ router.delete('/manage-expenses', async (req, res) => {
         if (!transaction) {
             return res.status(404).json({ message: 'Expense not found' });
         }
-
+        getEmail(req,res).then(email => {
+            notifyUser.emit('TransactionDeleted',transaction,email)
+        }).catch(err => {
+            console.error("Error fetching email:", err);
+        });
+        
         res.status(200).json({ message: "Transaction Deleted Successfully", transaction });
     } catch (error) {
         res.status(500).json({ message: "Error deleting transaction", error: error.message });
     }
 });
+
+notifyUser.on('TransactionDeleted',(transaction,email)=>{
+    const mailOptions = {
+        to: email,
+        from: 'govardhanavivek32@gmail.com',
+        subject: 'Transaction Removed',
+        text: `
+            Dear user,\n\n
+
+                You have deleted a transaction:\n\n
+
+                Amount : ${transaction.amount}\n
+                Description : ${transaction.description}\n
+                Category : ${transaction.category}\n
+                Date : ${transaction.date}\n
+                Transaction Type : ${transaction.expenseType}\n\n
+                
+                
+            Thank You.`
+
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+        if (err) return res.send({message:'Error sending email.'+err});
+        console.log('transaction sent to mail successfully')
+    });
+})
+
 router.get('/reports', async (req, res) => {
+    if (!req.session || !req.session.user) {
+        console.log("Session not found or user is not logged in.");
+        // Redirect to login page if session is invalid
+        return res.redirect('/');
+    }
     res.render('reports', { activePage: 'reports' })
 });
 
 
-router.post('/reports', async (req, res) => {
+router.post('/reports', verifyToken,async (req, res) => {
 
     const reportType = req.body.reportType;
     console.log(reportType)
@@ -725,5 +905,93 @@ async function getYearlyBreakdownIncomeExpenseReport(year, userId) {
         console.log(error)
     }
 }
+
+
+cron.schedule('48 21 * * *', async () => {
+    
+
+    console.log("cron job started.....");
+    // const userId = getUserId(req); // Replace with actual logic to get the userId
+    // console.log("id++"+userId)
+    
+    // Generate and send the report
+    console.log("getting userid..........")
+    
+    console.log("getting userid",userid);
+    await generateAndSendReport(userid);
+});
+
+const generateAndSendReport = async (userId) => {
+    console.log("Running monthly report cron job...");
+
+    const year = new Date().getFullYear();
+    const month = getMonth(new Date().getMonth() + 1); // 0 is January, 11 is December
+    console.log("month====="+month)
+
+    try {
+        console.log("came here.......")
+        const monthlyIncomeExpenseReportData = await getMonthlyIncomeExpenseReport(year, month, userId);
+        const monthlyCategoryWiseReportData = await getMonthlyCategoryWiseReport(year, month, userId);
+
+        const reportData = {
+            incomeExpenseReport: monthlyIncomeExpenseReportData,
+            categoryWiseReport: monthlyCategoryWiseReportData
+        };
+
+        // Get the user's email and send the report
+        getEmail().then(async(email)=>{
+            await sendEmailReport(reportData, email);
+            console.log("cron job ended....");
+        }).catch((err)=>{
+            console.log("error"+err);
+        });
+        
+        
+    } catch (error) {
+        console.error("Error during cron job execution:", error);
+    }
+};
+
+const sendEmailReport = async(report,email)=>{
+
+    console.log("came here mail........")
+    let categoryReport = '';
+    
+    // Loop through each category and create the report
+    report.categoryWiseReport.forEach((category) => {
+        categoryReport += `
+            Category: ${category.category}
+            Total Amount: ₹${category.totalAmount}
+            Percentage: ${category.percentage}%
+            ---------------------------
+            `;
+    });
+    const mailOptions = {
+        to: email,
+        from: 'govardhanavivek32@gmail.com',
+        subject: 'New Transaction Added',
+        text: `
+            Dear User,
+        
+            Your monthly Income vs Expense Report:\n\n
+            Total Expense : ${report.incomeExpenseReport.TotalExpense}\n
+            Total Income : ${report.incomeExpenseReport.TotalIncome}\n
+            Net Savings : ${report.incomeExpenseReport.NetSavings}\n\n
+            Your monthly Category vs Expense Report:\n\n
+            ${categoryReport}\n
+                
+                
+            Thank You!`
+    };
+
+    try {
+        console.log("came here mail transporter........")
+        transporter.sendMail(mailOptions);
+        console.log('Transaction sent to mail successfully');
+    } catch (err) {
+        console.error('Error sending email:', err);
+    }
+}
 module.exports = router;
+
 

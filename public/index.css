@@ -151,3 +151,19 @@ button:hover {
     }
    
 }
+
+#sendMagicLink{
+    padding: 0.8rem;
+    font-size: 1rem;
+    background: #2575fc;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 4px;
+    transition: background 0.3s;
+}
+#magiclinklogin{
+    width: 100%;
+}

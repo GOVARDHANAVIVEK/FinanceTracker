@@ -19,11 +19,12 @@
             </div>
             <!-- Login Form -->
             <form id="signin-form" class="form <%= activeForm === 'signin' ? 'active' : '' %>" action="/dashboard" method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="text" name="username" placeholder="Username" >
+                <input type="password" name="password" placeholder="Password" >
                 <button type="submit" id="sendSignin">Signin</button>
                 <span id="forgot-password"><a href="/forgot-password">Forgot password?</a></span>
             </form>
+           
             
             <!-- Signup Form -->
             <form id="signup-form" class="form <%= activeForm === 'signup' ? 'active' : '' %>" action="/dashboard" method="POST">

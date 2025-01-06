@@ -173,7 +173,7 @@ sendSignupBtn.addEventListener('click', async (event) => {
             
             // Redirect or update the UI after successful login
         }  else {
-            console.error(data.message || "Signup failed");
+            console.error( "Signup failed");
         }
     } catch (error) {
         console.error("Error:", error);

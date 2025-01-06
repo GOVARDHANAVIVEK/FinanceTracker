@@ -6,7 +6,7 @@ const verifyToken = require('./routes/Auth')
 const AuthRouter = require('./routes/Auth')
 const dashboardRoute = require('./routes/Dashboard')
 const expressLayouts = require('express-ejs-layouts');
-const nodemailer = require('nodemailer');
+const transporter = require('./middleware/nodemailer');
 const {SendMail,User} = require('./models/model')
 const crypto = require('crypto')
 const cors = require('cors');
@@ -43,13 +43,7 @@ app.use("/dashboard", dashboardRoute)
 
 
 // Nodemailer transporter
-const transporter = nodemailer.createTransport({
-    service: 'Gmail', // or another service provider
-    auth: {
-        user: 'govardhanavivek32@gmail.com',
-        pass: 'tesg mjnl mrvu pfqd'
-    }
-});
+
 
 
 app.get('/forgot-password', (req, res) => {
