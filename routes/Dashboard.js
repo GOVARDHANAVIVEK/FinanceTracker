@@ -907,91 +907,91 @@ async function getYearlyBreakdownIncomeExpenseReport(year, userId) {
 }
 
 
-cron.schedule('48 21 * * *', async () => {
+// cron.schedule('48 21 * * *', async () => {
     
 
-    console.log("cron job started.....");
-    // const userId = getUserId(req); // Replace with actual logic to get the userId
-    // console.log("id++"+userId)
+//     console.log("cron job started.....");
+//     // const userId = getUserId(req); // Replace with actual logic to get the userId
+//     // console.log("id++"+userId)
     
-    // Generate and send the report
-    console.log("getting userid..........")
+//     // Generate and send the report
+//     console.log("getting userid..........")
     
-    console.log("getting userid",userid);
-    await generateAndSendReport(userid);
-});
+//     console.log("getting userid",userid);
+//     await generateAndSendReport(userid);
+// });
 
-const generateAndSendReport = async (userId) => {
-    console.log("Running monthly report cron job...");
+// const generateAndSendReport = async (userId) => {
+//     console.log("Running monthly report cron job...");
 
-    const year = new Date().getFullYear();
-    const month = getMonth(new Date().getMonth() + 1); // 0 is January, 11 is December
-    console.log("month====="+month)
+//     const year = new Date().getFullYear();
+//     const month = getMonth(new Date().getMonth() + 1); // 0 is January, 11 is December
+//     console.log("month====="+month)
 
-    try {
-        console.log("came here.......")
-        const monthlyIncomeExpenseReportData = await getMonthlyIncomeExpenseReport(year, month, userId);
-        const monthlyCategoryWiseReportData = await getMonthlyCategoryWiseReport(year, month, userId);
+//     try {
+//         console.log("came here.......")
+//         const monthlyIncomeExpenseReportData = await getMonthlyIncomeExpenseReport(year, month, userId);
+//         const monthlyCategoryWiseReportData = await getMonthlyCategoryWiseReport(year, month, userId);
 
-        const reportData = {
-            incomeExpenseReport: monthlyIncomeExpenseReportData,
-            categoryWiseReport: monthlyCategoryWiseReportData
-        };
+//         const reportData = {
+//             incomeExpenseReport: monthlyIncomeExpenseReportData,
+//             categoryWiseReport: monthlyCategoryWiseReportData
+//         };
 
-        // Get the user's email and send the report
-        getEmail().then(async(email)=>{
-            await sendEmailReport(reportData, email);
-            console.log("cron job ended....");
-        }).catch((err)=>{
-            console.log("error"+err);
-        });
+//         // Get the user's email and send the report
+//         getEmail().then(async(email)=>{
+//             await sendEmailReport(reportData, email);
+//             console.log("cron job ended....");
+//         }).catch((err)=>{
+//             console.log("error"+err);
+//         });
         
         
-    } catch (error) {
-        console.error("Error during cron job execution:", error);
-    }
-};
+//     } catch (error) {
+//         console.error("Error during cron job execution:", error);
+//     }
+// };
 
-const sendEmailReport = async(report,email)=>{
+// const sendEmailReport = async(report,email)=>{
 
-    console.log("came here mail........")
-    let categoryReport = '';
+//     console.log("came here mail........")
+//     let categoryReport = '';
     
-    // Loop through each category and create the report
-    report.categoryWiseReport.forEach((category) => {
-        categoryReport += `
-            Category: ${category.category}
-            Total Amount: ₹${category.totalAmount}
-            Percentage: ${category.percentage}%
-            ---------------------------
-            `;
-    });
-    const mailOptions = {
-        to: email,
-        from: 'govardhanavivek32@gmail.com',
-        subject: 'New Transaction Added',
-        text: `
-            Dear User,
+//     // Loop through each category and create the report
+//     report.categoryWiseReport.forEach((category) => {
+//         categoryReport += `
+//             Category: ${category.category}
+//             Total Amount: ₹${category.totalAmount}
+//             Percentage: ${category.percentage}%
+//             ---------------------------
+//             `;
+//     });
+//     const mailOptions = {
+//         to: email,
+//         from: 'govardhanavivek32@gmail.com',
+//         subject: 'New Transaction Added',
+//         text: `
+//             Dear User,
         
-            Your monthly Income vs Expense Report:\n\n
-            Total Expense : ${report.incomeExpenseReport.TotalExpense}\n
-            Total Income : ${report.incomeExpenseReport.TotalIncome}\n
-            Net Savings : ${report.incomeExpenseReport.NetSavings}\n\n
-            Your monthly Category vs Expense Report:\n\n
-            ${categoryReport}\n
+//             Your monthly Income vs Expense Report:\n\n
+//             Total Expense : ${report.incomeExpenseReport.TotalExpense}\n
+//             Total Income : ${report.incomeExpenseReport.TotalIncome}\n
+//             Net Savings : ${report.incomeExpenseReport.NetSavings}\n\n
+//             Your monthly Category vs Expense Report:\n\n
+//             ${categoryReport}\n
                 
                 
-            Thank You!`
-    };
+//             Thank You!`
+//     };
 
-    try {
-        console.log("came here mail transporter........")
-        transporter.sendMail(mailOptions);
-        console.log('Transaction sent to mail successfully');
-    } catch (err) {
-        console.error('Error sending email:', err);
-    }
-}
+//     try {
+//         console.log("came here mail transporter........")
+//         transporter.sendMail(mailOptions);
+//         console.log('Transaction sent to mail successfully');
+//     } catch (err) {
+//         console.error('Error sending email:', err);
+//     }
+// }
 module.exports = router;
 
 
