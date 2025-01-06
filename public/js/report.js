@@ -2,10 +2,6 @@ const logoutBtn = document.getElementById('logout-btn').addEventListener('click'
     e.preventDefault()
     handleLogout()
 });
-
-import { schedule } from 'node-cron';
-
-
 function checkTokenExpiry() {
     const token = localStorage.getItem('Access token');
     console.log("hereeeeee")
