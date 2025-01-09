@@ -9,6 +9,11 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+const EventEmitter = require('events')
+
+// class FinanceEventEmitter extends EventEmitter {}
+const notifyUser = new EventEmitter();
 
 
-module.exports = transporter;
+module.exports = {notifyUser,transporter};
+

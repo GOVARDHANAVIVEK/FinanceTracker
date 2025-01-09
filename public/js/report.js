@@ -4,18 +4,16 @@ const logoutBtn = document.getElementById('logout-btn').addEventListener('click'
 });
 function checkTokenExpiry() {
     const token = localStorage.getItem('Access token');
-    console.log("hereeeeee")
-    console.log("token check"+token)
+    // console.log("hereeeeee")
+    // console.log("token check"+token)
     if (token) {
         const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
         const expiry = payload.exp * 1000; // Convert to milliseconds
-        console.log("payload "+payload)
+        // console.log("payload "+payload)
         if (Date.now() > expiry) {
             alert("Session expired. Please log in again.");
             handleLogout(); // Clear token and redirect to login
         }
-    }else{
-        console.log("bjd")
     }
     }
 function handleLogout() {
@@ -131,7 +129,7 @@ function populateYearDropdown() {
 
 generate.style.display="none"
 generate.addEventListener('click',(e)=>{
-  console.log("reportType+"+reportType)
+  // console.log("reportType+"+reportType)
   if(reportType == "Monthly"){
 
     IEReporttitle.textContent = "Monthly Income & Expense Report";
@@ -168,7 +166,7 @@ async function getRecords(reportType){
         
         method:'POST',
         headers:{
-          'authorization':  `Beare ${token}`,
+          'authorization':  `Bearer ${token}`,
           'Content-Type':'application/json'
         },
         body:JSON.stringify({YEAR,MONTH,reportType})
@@ -176,7 +174,7 @@ async function getRecords(reportType){
       const data = await response.json();
       if(response.ok){
         
-        console.log("data:-->"+JSON.stringify(data))
+        // console.log("data:-->"+JSON.stringify(data))
         if(data && data.categoryWiseReport.length>0){
           IEReport.innerHTML =''
           PrintIncomeExpenseReport(data?.expenseIncomeReport)
@@ -198,7 +196,7 @@ async function getRecords(reportType){
         }
         
       }else{
-        console.log("error :"+data.message)
+        // console.log("error :"+data.message)
       }
     }else if (reportType =="Yearly"){
       report3.style.display=""
@@ -208,7 +206,7 @@ async function getRecords(reportType){
         
         method:'POST',
         headers:{
-          'authorization':  `Beare ${token}`,
+          'authorization':  `Bearer ${token}`,
           'Content-Type':'application/json'
         },
         body:JSON.stringify({YEAR,reportType})
@@ -216,7 +214,7 @@ async function getRecords(reportType){
       const data = await response.json();
       if(response.ok){
         
-        console.log("data:"+JSON.stringify(data))
+        // console.log("data:"+JSON.stringify(data))
         if(data && data.YearcategoryWiseReport.length>0){
           IEReport.innerHTML =''
           PrintYearlyIncomeExpenseReport(data?.YearexpenseIncomeReport)
@@ -245,11 +243,11 @@ async function getRecords(reportType){
         }
         
       }else{
-        console.log("error :"+data.message)
+        // console.log("error :"+data.message)
       }
     }else if(reportType == "Quarterly"){
       report3.style.display="none"
-      console.log("called- Quarterly")
+      // console.log("called- Quarterly")
       const YEAR = document.getElementById('year').value;
       const QUARTER = document.getElementById('quarter').value;
       const token = localStorage.getItem('Access token');
@@ -257,7 +255,7 @@ async function getRecords(reportType){
         
         method:'POST',
         headers:{
-          'authorization':  `Beare ${token}`,
+          'authorization':  `Bearer ${token}`,
           'Content-Type':'application/json'
         },
         body:JSON.stringify({YEAR,QUARTER,reportType})
@@ -265,7 +263,7 @@ async function getRecords(reportType){
       const data = await response.json();
       if(response.ok){
         
-        console.log("data:"+JSON.stringify(data?.data))
+        // console.log("data:"+JSON.stringify(data?.data))
         if(data && data.QuartercategoryWiseReport.length>0){
           IEReport.innerHTML =''
           PrintQuarterlyIncomeExpenseReport(data?.QuarterexpenseIncomeReport)
@@ -285,12 +283,12 @@ async function getRecords(reportType){
 
           
       }else{
-        console.log("error :"+data.message)
+        // console.log("error :"+data.message)
       }
       
     }
   } catch (error) {
-    console.log("Error :"+error)
+    // console.log("Error :"+error)
     throw error
   }
   
@@ -342,10 +340,10 @@ function updateSummary(data) {
 function PrintIncomeExpenseReport(InputData) {
 
   IEReport.style.display="inline"
-  console.log("got data=:", InputData);
+  // console.log("got data=:", InputData);
 
   if (!InputData || !InputData.TotalExpense || !InputData.TotalIncome || !InputData.NetSavings) {
-    console.log("Invalid or missing InputData");
+    // console.log("Invalid or missing InputData");
     return [];
   }
 
@@ -355,7 +353,7 @@ function PrintIncomeExpenseReport(InputData) {
     { label: "Total Income", value: Number(InputData["TotalIncome"]) },
     { label: "Net Savings", value: Number(InputData["NetSavings"]) }
   ];
-  console.log(data);
+  // console.log(data);
 
   
   const width = 500; // Full container width
@@ -430,12 +428,12 @@ function PrintIncomeExpenseReport(InputData) {
 }
 
 function PrintCategoryExpenseReport(InputData, data) {
-  console.log("Category Wise Report");
-  console.log("IE Data: " + JSON.stringify(InputData));
-  console.log("Category Data: " + JSON.stringify(data));
+  // console.log("Category Wise Report");
+  // console.log("IE Data: " + JSON.stringify(InputData));
+  // console.log("Category Data: " + JSON.stringify(data));
 
   if (!data || data.length === 0) {
-      console.log("No data available for the pie chart.");
+      // console.log("No data available for the pie chart.");
       resetSummary()
       return[];
   }
@@ -537,7 +535,7 @@ function resetSummary(){
 function PrintYearlyIncomeExpenseReport(InputData) {
 
   IEReport.style.display="inline"
-  console.log("got data=:", InputData);
+  // console.log("got data=:", InputData);
 
   if (!InputData || !InputData.TotalExpense || !InputData.TotalIncome || !InputData.NetSavings) {
     console.log("Invalid or missing InputData");
@@ -550,7 +548,7 @@ function PrintYearlyIncomeExpenseReport(InputData) {
     { label: "Total Income", value: Number(InputData["TotalIncome"]) },
     { label: "Net Savings", value: Number(InputData["NetSavings"]) }
   ];
-  console.log(data);
+  // console.log(data);
 
   const width = 500; // Full container width
   const height = width * 0.6;
@@ -618,9 +616,9 @@ function PrintYearlyIncomeExpenseReport(InputData) {
 
 
 async function PrintYearlyCategoryExpenseReport(InputData,data){
-    console.log("Category Wise Report");
-    console.log("IE Data: " + JSON.stringify(InputData));
-    console.log("Category Data: " + JSON.stringify(data));
+    // console.log("Category Wise Report");
+    // console.log("IE Data: " + JSON.stringify(InputData));
+    // console.log("Category Data: " + JSON.stringify(data));
 
     if (!data || data.length === 0) {
         console.log("No data available for the pie chart.");
@@ -717,7 +715,7 @@ async function PrintYearlyCategoryExpenseReport(InputData,data){
 
 async function PrintQuarterlyIncomeExpenseReport(InputData) {
   IEReport.style.display="inline"
-  console.log("got data=:", InputData);
+  // console.log("got data=:", InputData);
 
   if (!InputData || !InputData.TotalExpense || !InputData.TotalIncome || !InputData.NetSavings) {
     console.log("Invalid or missing InputData");
@@ -730,7 +728,7 @@ async function PrintQuarterlyIncomeExpenseReport(InputData) {
     { label: "Total Income", value: Number(InputData["TotalIncome"]) },
     { label: "Net Savings", value: Number(InputData["NetSavings"]) }
   ];
-  console.log(data);
+  // console.log(data);
 
   const width = 500; // Full container width
   const height = width * 0.6;
@@ -804,9 +802,9 @@ async function PrintQuarterlyIncomeExpenseReport(InputData) {
 }
 
 async function PrintQuarterlyCategoryExpenseReport(InputData,data) {
-  console.log("Category Wise Report");
-    console.log("IE Data: " + JSON.stringify(InputData));
-    console.log("Category Data: " + JSON.stringify(data));
+  // console.log("Category Wise Report");
+    // console.log("IE Data: " + JSON.stringify(InputData));
+    // console.log("Category Data: " + JSON.stringify(data));
 
     if (!data || data.length === 0) {
         console.log("No data available for the pie chart.");
@@ -903,7 +901,7 @@ async function PrintQuarterlyCategoryExpenseReport(InputData,data) {
 
 async function PrintYearlyBreakdownIncomeExpenseReport(InputData) {
   BreakdownReport.style.display = "inline";
-console.log("Received Data:", InputData);
+// console.log("Received Data:", InputData);
 
 if (!InputData) {
   console.log("Invalid or missing InputData");

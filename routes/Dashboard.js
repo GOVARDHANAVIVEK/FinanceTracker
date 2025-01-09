@@ -6,43 +6,25 @@ const jwt = require('jsonwebtoken');
 const currentDate = new Date();
 const mongoose = require('mongoose');
 const internal = require('stream');
-const transporter = require('../middleware/nodemailer')
+const {transporter,notifyUser} = require('../middleware/nodemailer')
 const cron = require('node-cron')
-const {notifyUser} = require('../middleware/events')
+
 const { use } = require('bcrypt/promises');
-let userid = ""
-const verifyToken = async (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1]; // Get token from Authorization header
+const verifyToken = require('../routes/Auth')
+const {getMonth,getEmail,formatDate,getYearlyBreakdownIncomeExpenseReport,getQuarterlyCategoryWiseReport,getYearlyCategoryWiseReport,getQuarterlyIncomeExpenseReport,getYearlyIncomeExpenseReport,getMonthlyCategoryWiseReport,getMonthlyIncomeExpenseReport}=require('../middleware/helperFunctions')
+let userId = ""
 
-    if (!token) {
-        return res.status(403).send({ message: 'No token provided' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_secret);
-        console.log(decoded)
-        req.userId = decoded.userId;
-        userid = req.userId
-        req.email = decoded.email // Assuming userId is part of the payload
-        next();
-    } catch (error) {
-        return res.status(401).json({ message: 'Invalid or expired token' });
-    }
-};
 router.get('/',async (req, res) => {
-    if (!req.session || !req.session.user) {
-        console.log("Session not found or user is not logged in.");
-        // Redirect to login page if session is invalid
-        return res.redirect('/');
-    }
+    console.log("req---->"+JSON.stringify(req.session))
+    
     let finalMonthlySummary = [];
     try {
-        if (!req.session || !req.session.user) {
+        if (!req.session || !req.session.userInfo) {
             console.log("Session not found or user is not logged in.");
             // Redirect to login page if session is invalid
             return res.redirect('/');
         }
-        const userId = req.session.user.userId // Assume verifyToken middleware sets req.userId
+        userId = req.session.userInfo.userId // Assume verifyToken middleware sets req.userId
         console.log(userId)
         const user = await User.findById(userId);
         const username = user ? user.Username : "Guest";
@@ -159,49 +141,18 @@ router.get('/',async (req, res) => {
 });
 
 router.post('/', verifyToken, (req, res) => {
-    if (!req.session.user) {
-        req.session.user = {}; // Initialize `req.session.user` if it doesn’t exist
-    }
-    req.session.user.userId = req.userId;
-    req.session.user.useremail = req.email;
-    // req.session.user.username = req.user.Username;
-    console.log(req.session.user)
-    // Set the username from the `req.user` token data
-    // req.session.user.username = req.user.Username;
-
+    
     // Redirect to the dashboard
+    if(!req.session){
+        req.session={}
+    }
+    req.session.userInfo = req.user
+    console.log("req-body"+JSON.stringify(req.session.userInfo))
     res.redirect('/dashboard')
 
 });
 
-const months_literals = {
-    1: "Jan",
-    2: "Feb",
-    3: "Mar",
-    4: "Apr",
-    5: "May",
-    6: "Jun",
-    7: "Jul",
-    8: "Aug",
-    9: "Sep",
-    10: "Oct",
-    11: "Nov",
-    12: "Dec"
-}
-const getMonth = (month) => {
-    const monthNumber = parseInt(month, 10); // Convert to a number
-    console.log("month=====" + months_literals[monthNumber]);
-    return months_literals[monthNumber];
-}
-const getEmail =async()=>{
-    
-    const user = await User.findById(userid)
-    if(!user){
-        return null
-    }
-    console.log(user.Email)
-    return user.Email;
-}
+
 
 router.post('/add-expense', verifyToken, async (req, res) => {
     let totalIncome = 0
@@ -209,8 +160,8 @@ router.post('/add-expense', verifyToken, async (req, res) => {
     let balance = 0
     try {
         const { Year, Month, Amount, Category, ExpenseType, Description } = req.body
-        const userId = req.session.user.userId;
-        console.log("email=="+req.session.user.useremail)
+        // const userId = req.session.user.userId;
+        console.log("email=="+req.session.userInfo.email)
 
         console.log(userId)
         // console.log(userId)
@@ -218,7 +169,7 @@ router.post('/add-expense', verifyToken, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        req.session.user.useremail = user.Email;
+        req.session.userInfo.email = user.Email;
         const newExpense = new Expense({
             userId: userId,
             year: Year || currentDate.getFullYear(),
@@ -289,28 +240,16 @@ notifyUser.on('transactionCreated',(expense,email)=>{
     });
 });
 
-const getUserId=(req)=>{
-    console.log(req.session.user.userId)
-    return req.session.user.userId
-}
 
-
-const formatDate = (date) => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const year = date.getFullYear();
-
-    return `${day}-${month}-${year}`;
-};
 
 router.get('/add-expense',async (req, res) => {
     try {
-        if (!req.session || !req.session.user) {
+        if (!req.session || !req.session.userInfo) {
             console.log("Session not found or user is not logged in.");
             // Redirect to login page if session is invalid
             return res.redirect('/');
         }
-        const userId = req.session.user.userId;
+        // const userId = req.session.userInfo.userId;
         const today = formatDate(new Date());
         console.log("today:"+today)
         const todayTransactions = await Expense.find({
@@ -329,14 +268,14 @@ router.get('/add-expense',async (req, res) => {
 })
 router.get('/manage-expenses',async (req, res) => {
     try {
-        if (!req.session || !req.session.user) {
+        if (!req.session || !req.session.userInfo) {
             console.log("Session not found or user is not logged in.");
             // Redirect to login page if session is invalid
             return res.redirect('/');
         }
-        console.log(req.session.user)
-        const userId = req.session.user.userId;
-        console.log(userId)
+        // console.log(req.session.user)
+        // const userId = req.session.user.userId;
+        // console.log(userId)
         
         const currentMonthNumber = String(currentDate.getMonth() + 1).padStart(2, '0');
         console.log("Current Month Number:", currentMonthNumber);
@@ -389,7 +328,7 @@ router.put('/manage-expenses', verifyToken,async (req, res) => {
 
         // Save the updated transaction
         await transaction.save();
-        getEmail(req,res).then(email => {
+        getEmail(userId).then(email => {
             console.log("originalTransaction+++++++"+originalTransaction)
             console.log("Transaction+++++++"+transaction)
             notifyUser.emit('TransactionUpdated',JSON.parse(originalTransaction),transaction,email)
@@ -452,7 +391,7 @@ router.delete('/manage-expenses',verifyToken, async (req, res) => {
         if (!transaction) {
             return res.status(404).json({ message: 'Expense not found' });
         }
-        getEmail(req,res).then(email => {
+        getEmail(userId).then(email => {
             notifyUser.emit('TransactionDeleted',transaction,email)
         }).catch(err => {
             console.error("Error fetching email:", err);
@@ -492,7 +431,7 @@ notifyUser.on('TransactionDeleted',(transaction,email)=>{
 })
 
 router.get('/reports', async (req, res) => {
-    if (!req.session || !req.session.user) {
+    if (!req.session || !req.session.userInfo) {
         console.log("Session not found or user is not logged in.");
         // Redirect to login page if session is invalid
         return res.redirect('/');
@@ -505,8 +444,8 @@ router.post('/reports', verifyToken,async (req, res) => {
 
     const reportType = req.body.reportType;
     console.log(reportType)
-    const userId = req.session.user.userId;
-    console.log(userId)
+    // const userId = req.session.user.userId;
+    console.log("reports====="+userId)
     if (reportType == "Monthly") {
         try {
             const year = req.body.YEAR;
@@ -556,442 +495,118 @@ router.post('/reports', verifyToken,async (req, res) => {
 
 });
 
-async function getMonthlyIncomeExpenseReport(year, month, userId) {
-    let TotalIncome = 0
-    let TotalExpense = 0
-    let NetSavings = 0;
-    try {
-        console.log(year, month)
-        const transactions = await Expense.find({
-            userId, // assuming `userId` is stored in each transaction document
-            year,
-            month: String(month)
-        });
-        if (!transactions || transactions.length === 0) {
-            console.log("No transactions found.");
-            return [];
-        }
-        console.log("User transactions for the selected period:", transactions);
-        transactions.forEach(transaction => {
-            console.log(transaction.expenseType)
-            transaction.expenseType == "expense" ? (TotalExpense = TotalExpense + transaction.amount) : (TotalIncome = TotalIncome + transaction.amount);
-            console.log(TotalExpense, TotalIncome)
-        });
-        NetSavings = TotalIncome - TotalExpense
-        console.log("Expense = :" + TotalExpense, "Income= :" + TotalIncome, "NetSavings= :" + NetSavings)
-        const results = {
-            TotalExpense,
-            TotalIncome,
-            NetSavings
-        }
-        return results;
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error; // propagate the error for proper error handling in the route
-    }
-}
-
-async function getMonthlyCategoryWiseReport(year, month, userId) {
-    try {
-        console.log("Input:", year, month, userId);
-
-        // Fetch all transactions for the given userId, year, and month
-        const transactions = await Expense.find({
-            userId: userId,
-            year: String(year),     // Ensure year is a string
-            month: month            // Ensure month is a string
-        });
-
-        // Check if transactions are found
-        if (!transactions || transactions.length === 0) {
-            console.log("No transactions found.");
-            return [];
-        }
-
-        // Fetch total income for the user in the specified month and year
-        const incomeTransactions = await Expense.find({
-            userId: userId,
-            year: String(year),
-            month: month,
-            expenseType: "income"  // Filtering income transactions
-        });
-
-        const totalIncome = incomeTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
-
-        if (totalIncome === 0) {
-            console.log("Total income is zero, cannot calculate percentages.");
-            return [];
-        }
-
-        console.log("Total Income:", totalIncome);
-
-        // Group expense transactions by category and sum the amounts
-        const categoryWiseData = transactions.reduce((acc, transaction) => {
-            const { category, amount, expenseType } = transaction;
-
-            // Consider only expenses
-            if (expenseType === "expense") {
-                if (acc[category]) {
-                    acc[category] += amount;
-                } else {
-                    acc[category] = amount;
-                }
-            }
-            return acc;
-        }, {});
-
-        // Convert the result into an array of objects with category, totalAmount, and percentage
-        const result = Object.keys(categoryWiseData).map((category) => {
-            const totalAmount = categoryWiseData[category];
-            const percentage = ((totalAmount / totalIncome) * 100).toFixed(2);  // Calculate percentage
-
-            return {
-                category: category,
-                totalAmount: totalAmount,
-                percentage: percentage
-            };
-        });
-
-        console.log("Category-wise Aggregated Results with Percentage:", result);
-        return result;
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error; // propagate the error for proper error handling in the route
-    }
-}
 
 
-async function getYearlyIncomeExpenseReport(year, userId) {
-    let TotalIncome = 0
-    let TotalExpense = 0
-    let NetSavings = 0;
-    try {
-        console.log(year)
-        const transactions = await Expense.find({
-            userId, // assuming `userId` is stored in each transaction document
-            year
-        });
-
-        console.log("User transactions for the selected period:", transactions);
-        transactions.forEach(transaction => {
-            console.log(transaction.expenseType)
-            transaction.expenseType == "expense" ? (TotalExpense = TotalExpense + transaction.amount) : (TotalIncome = TotalIncome + transaction.amount);
-            console.log(TotalExpense, TotalIncome)
-        });
-        NetSavings = TotalIncome - TotalExpense
-        console.log("Expense = :" + TotalExpense, "Income= :" + TotalIncome, "NetSavings= :" + NetSavings)
-        const results = {
-            TotalExpense,
-            TotalIncome,
-            NetSavings
-        }
-        return results;
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error; // propagate the error for proper error handling in the route
-    }
-}
-
-
-async function getYearlyCategoryWiseReport(year, userId) {
-    try {
-        console.log("Input:", year, userId);
-
-        // Fetch all transactions for the given userId, year, and month
-        const transactions = await Expense.find({
-            userId: userId,
-            year: String(year)     // Ensure year is a string       // Ensure month is a string
-        });
-
-        // Check if transactions are found
-        if (!transactions || transactions.length === 0) {
-            console.log("No transactions found.");
-            return [];
-        }
-
-        // Fetch total income for the user in the specified month and year
-        const incomeTransactions = await Expense.find({
-            userId: userId,
-            year: String(year),
-            expenseType: "income"  // Filtering income transactions
-        });
-
-        const totalIncome = incomeTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
-
-        if (totalIncome === 0) {
-            console.log("Total income is zero, cannot calculate percentages.");
-            return [];
-        }
-
-        console.log("Total Income:", totalIncome);
-
-        // Group expense transactions by category and sum the amounts
-        const categoryWiseData = transactions.reduce((acc, transaction) => {
-            const { category, amount, expenseType } = transaction;
-
-            // Consider only expenses
-            if (expenseType === "expense") {
-                if (acc[category]) {
-                    acc[category] += amount;
-                } else {
-                    acc[category] = amount;
-                }
-            }
-            return acc;
-        }, {});
-
-        // Convert the result into an array of objects with category, totalAmount, and percentage
-        const result = Object.keys(categoryWiseData).map((category) => {
-            const totalAmount = categoryWiseData[category];
-            const percentage = ((totalAmount / totalIncome) * 100).toFixed(2);  // Calculate percentage
-
-            return {
-                category: category,
-                totalAmount: totalAmount,
-                percentage: percentage
-            };
-        });
-
-        console.log("Category-wise Aggregated Results with Percentage:", result);
-        return result;
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error; // propagate the error for proper error handling in the route
-    }
-}
-
-async function getQuarterlyIncomeExpenseReport(year, quarter, userId) {
-    let TotalIncome = 0
-    let TotalExpense = 0
-    let NetSavings = 0;
-    try {
-        const transactions = await Expense.find({
-            userId: userId,
-            year: year,
-            month: { $in: quarter },
-        });
-
-        console.log(transactions)
-
-        if (!transactions || transactions.length === 0) {
-            console.log("No transactions found.");
-            return [];
-        }
-
-        transactions.forEach(transaction => {
-            console.log(transaction.expenseType)
-            transaction.expenseType == "expense" ? (TotalExpense = TotalExpense + transaction.amount) : (TotalIncome = TotalIncome + transaction.amount);
-            console.log(TotalExpense, TotalIncome)
-        });
-        NetSavings = TotalIncome - TotalExpense
-        console.log("Expense = :" + TotalExpense, "Income= :" + TotalIncome, "NetSavings= :" + NetSavings)
-        const results = {
-            TotalExpense,
-            TotalIncome,
-            NetSavings
-        }
-        return results;
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error; // propagate the error for proper error handling in the route
-    }
-}
-
-async function getQuarterlyCategoryWiseReport(year, quarter, userId) {
-    try {
-        console.log("Input:", year, userId);
-
-        // Fetch all transactions for the given userId, year, and month
-        const transactions = await Expense.find({
-            userId: userId,
-            year: String(year),
-            month: { $in: quarter },    // Ensure year is a string       // Ensure month is a string
-        });
-
-        // Check if transactions are found
-        if (!transactions || transactions.length === 0) {
-            console.log("No transactions found.");
-            return [];
-        }
-
-        // Fetch total income for the user in the specified month and year
-        const incomeTransactions = await Expense.find({
-            userId: userId,
-            year: String(year),
-            month: { $in: quarter },
-            expenseType: "income"  // Filtering income transactions
-        });
-
-        const totalIncome = incomeTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
-
-        if (totalIncome === 0) {
-            console.log("Total income is zero, cannot calculate percentages.");
-            return [];
-        }
-
-        console.log("Total Income:", totalIncome);
-
-        // Group expense transactions by category and sum the amounts
-        const categoryWiseData = transactions.reduce((acc, transaction) => {
-            const { category, amount, expenseType } = transaction;
-
-            // Consider only expenses
-            if (expenseType === "expense") {
-                if (acc[category]) {
-                    acc[category] += amount;
-                } else {
-                    acc[category] = amount;
-                }
-            }
-            return acc;
-        }, {});
-
-        // Convert the result into an array of objects with category, totalAmount, and percentage
-        const result = Object.keys(categoryWiseData).map((category) => {
-            const totalAmount = categoryWiseData[category];
-            const percentage = ((totalAmount / totalIncome) * 100).toFixed(2);  // Calculate percentage
-
-            return {
-                category: category,
-                totalAmount: totalAmount,
-                percentage: percentage
-            };
-        });
-
-        console.log("Category-wise Aggregated Results with Percentage:", result);
-        return result;
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error; // propagate the error for proper error handling in the route
-    }
-}
-
-
-async function getYearlyBreakdownIncomeExpenseReport(year, userId) {
-    try {
-        console.log({ year, userId })
-        const transactions = await Expense.find({
-            userId,
-            year
-        });
-
-        console.log(transactions)
-        const monthlyData = {};
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        months.forEach(month => {
-            monthlyData[month] = { income: 0, expense: 0, netSavings: 0 };
-        })
-        console.log(monthlyData)
-        transactions.forEach(transaction => {
-            const { month, expenseType, amount } = transaction;
-            if (month.includes(month)) {
-                if (expenseType == "income") {
-                    monthlyData[month].income += amount;
-                } else if (expenseType === "expense") {
-                    monthlyData[month].expense += amount;
-                }
-                monthlyData[month].netSavings = monthlyData[month].income - monthlyData[month].expense;
-            }
-        })
-        const result = months.map(month => ({
-            month,
-            income: monthlyData[month].income,
-            expense: monthlyData[month].expense,
-            netSavings: monthlyData[month].netSavings
-        }));
-
-        return result;
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-
-// cron.schedule('48 21 * * *', async () => {
+cron.schedule('21 22 * * *', async () => {
     
 
-//     console.log("cron job started.....");
-//     // const userId = getUserId(req); // Replace with actual logic to get the userId
-//     // console.log("id++"+userId)
+    console.log("cron job started.....");
+    // const userId = getUserId(req); // Replace with actual logic to get the userId
+    // console.log("id++"+userId)
     
-//     // Generate and send the report
-//     console.log("getting userid..........")
+    // Generate and send the report
+    try {
+        const userIds = await User.find({}, { _id: 1 }).lean();
+        const userIdList = userIds.map(user => user._id.toString()).filter(id => id);
+
+        console.log('User IDs:', userIdList);
+        for (const userId of userIdList) {
+            console.log("Processing user ID:", userId);
+            await generateAndSendReport(userId);
+        }
+
+        console.log("Cron job completed.");
+    } catch (error) {
+        console.error("Error during cron job execution:", error);
+    }
+    // console.log("getting userid",userid);
     
-//     console.log("getting userid",userid);
-//     await generateAndSendReport(userid);
-// });
+});
 
-// const generateAndSendReport = async (userId) => {
-//     console.log("Running monthly report cron job...");
+const generateAndSendReport = async (userId) => {
+    console.log("Running monthly report cron job...");
 
-//     const year = new Date().getFullYear();
-//     const month = getMonth(new Date().getMonth() + 1); // 0 is January, 11 is December
-//     console.log("month====="+month)
+    const year = new Date().getFullYear();
+    const month = getMonth(new Date().getMonth() + 1); // 0 is January, 11 is December
+    console.log("month====="+month)
 
-//     try {
-//         console.log("came here.......")
-//         const monthlyIncomeExpenseReportData = await getMonthlyIncomeExpenseReport(year, month, userId);
-//         const monthlyCategoryWiseReportData = await getMonthlyCategoryWiseReport(year, month, userId);
-
-//         const reportData = {
-//             incomeExpenseReport: monthlyIncomeExpenseReportData,
-//             categoryWiseReport: monthlyCategoryWiseReportData
-//         };
-
-//         // Get the user's email and send the report
-//         getEmail().then(async(email)=>{
-//             await sendEmailReport(reportData, email);
-//             console.log("cron job ended....");
-//         }).catch((err)=>{
-//             console.log("error"+err);
-//         });
+    try {
         
-        
-//     } catch (error) {
-//         console.error("Error during cron job execution:", error);
-//     }
-// };
+       
+        if(userId && typeof userId === 'string' && userId.length === 24){
+            console.log("came here.......",userId)
+        const monthlyIncomeExpenseReportData = await getMonthlyIncomeExpenseReport(year, month, userId);
+        const monthlyCategoryWiseReportData = await getMonthlyCategoryWiseReport(year, month, userId);
 
-// const sendEmailReport = async(report,email)=>{
+        if (monthlyIncomeExpenseReportData && monthlyCategoryWiseReportData &&
+            (monthlyIncomeExpenseReportData.TotalExpense > 0 || monthlyCategoryWiseReportData.length > 0)) {
 
-//     console.log("came here mail........")
-//     let categoryReport = '';
+            const reportData = {
+                incomeExpenseReport: monthlyIncomeExpenseReportData,
+                categoryWiseReport: monthlyCategoryWiseReportData
+            };
+            getEmail(userId).then(async(email)=>{
+                console.log("starting sending email",email)
+                await sendEmailReport(reportData, email);
+                console.log("cron job ended....");
+            }).catch((err)=>{
+                console.log("error"+err);
+            });
+        }else {
+            console.log("No transactions for this user, skipping email.");
+        }
+    }
+        // Get the user's email and send the report
+       
     
-//     // Loop through each category and create the report
-//     report.categoryWiseReport.forEach((category) => {
-//         categoryReport += `
-//             Category: ${category.category}
-//             Total Amount: ₹${category.totalAmount}
-//             Percentage: ${category.percentage}%
-//             ---------------------------
-//             `;
-//     });
-//     const mailOptions = {
-//         to: email,
-//         from: 'govardhanavivek32@gmail.com',
-//         subject: 'New Transaction Added',
-//         text: `
-//             Dear User,
         
-//             Your monthly Income vs Expense Report:\n\n
-//             Total Expense : ${report.incomeExpenseReport.TotalExpense}\n
-//             Total Income : ${report.incomeExpenseReport.TotalIncome}\n
-//             Net Savings : ${report.incomeExpenseReport.NetSavings}\n\n
-//             Your monthly Category vs Expense Report:\n\n
-//             ${categoryReport}\n
-                
-                
-//             Thank You!`
-//     };
+    } catch (error) {
+        console.error("Error during cron job execution:", error);
+    }
+};
 
-//     try {
-//         console.log("came here mail transporter........")
-//         transporter.sendMail(mailOptions);
-//         console.log('Transaction sent to mail successfully');
-//     } catch (err) {
-//         console.error('Error sending email:', err);
-//     }
-// }
+const sendEmailReport = async(report,email)=>{
+
+    console.log("came here mail........")
+    let categoryReport = '';
+    
+    // Loop through each category and create the report
+    report.categoryWiseReport.forEach((category) => {
+        categoryReport += `
+            Category: ${category.category}
+            Total Amount: ₹${category.totalAmount}
+            Percentage: ${category.percentage}%
+            ---------------------------
+            `;
+    });
+    const mailOptions = {
+        to: email,
+        from: 'govardhanavivek32@gmail.com',
+        subject: 'Monthly Report',
+        text: `
+            Dear User,
+
+            Your monthly Income vs Expense Report:
+            
+                Total Expense: ₹${report.incomeExpenseReport.TotalExpense}
+                Total Income: ₹${report.incomeExpenseReport.TotalIncome}
+                Net Savings: ₹${report.incomeExpenseReport.NetSavings}
+            
+            Your monthly Category vs Expense Report:
+                 ${categoryReport}
+            Thank You!`
+    };
+
+    try {
+        console.log("came here mail transporter........")
+        await transporter.sendMail(mailOptions);
+        console.log('Transaction sent to mail successfully');
+    } catch (err) {
+        console.error('Error sending email:', err);
+    }
+}
+
+
 module.exports = router;
 
 

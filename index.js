@@ -5,7 +5,6 @@ const dotenv = require('dotenv');
 const verifyToken = require('./routes/Auth')
 const AuthRouter = require('./routes/Auth')
 const dashboardRoute = require('./routes/Dashboard')
-const expressLayouts = require('express-ejs-layouts');
 const transporter = require('./middleware/nodemailer');
 const {SendMail,User} = require('./models/model')
 const crypto = require('crypto')
@@ -13,7 +12,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt')
 dotenv.config();
 const app = express();
-
+const mongoose = require('mongoose')
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,15 +20,30 @@ app.use('/public', express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-// app.use(cors({
-//     origin: 'https://financetracker-jlmk.onrender.com'
-//   }));
+app.use(cors({
+    origin: 'https://financetracker-jlmk.onrender.com'
+  }));
 app.use(session({
     secret: process.env.JWT_secret || 'yourSecretKey', // Make sure to replace with a strong key
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true in production with HTTPS
+    cookie: { secure: true } // Set to true in production with HTTPS
 }));
+
+
+// database connection 
+mongoose.connect(process.env.Mongo_Uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+    .then(() => {
+        console.log('MongoDB connected successfully');
+    })
+    .catch((error) => {
+        console.error('MongoDB connection failed:', error.message);
+});
+
+
 app.get('/verify-token', verifyToken, (req, res) => {
     res.status(200).json({ message: 'Token is valid' });
 });

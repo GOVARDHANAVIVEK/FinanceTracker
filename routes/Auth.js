@@ -1,5 +1,5 @@
 const express = require('express')
-const mongoose = require('mongoose')
+
 const { User } = require('../models/model')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
@@ -8,16 +8,8 @@ const path = require('path')
 const { body, validationResult } = require('express-validator');
 require('dotenv').config()
 
-mongoose.connect(process.env.Mongo_Uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-    .then(() => {
-        console.log('MongoDB connected successfully');
-    })
-    .catch((error) => {
-        console.error('MongoDB connection failed:', error.message);
-    });
+
+
 
 
 router.post('/signup', async (req, res) => {
@@ -102,16 +94,19 @@ router.post('/signin', [
                 return res.status(400).send("Incorrect password.")
             } else {
                 const accesstoken = jwt.sign({
-                    Username: username, Password: existinguser.Password, userId: existinguser.
-                        _id
+                    Username: username, userId: existinguser.
+                        _id,email:existinguser.Email
                 },
                     JWT_secret = process.env.JWT_secret,
                     { expiresIn: '30m' }
                 );
-                const refreshtoken = jwt.sign({ Username: username, Password: existinguser.Password },
+                console.log("access->"+accesstoken)
+                const refreshtoken = jwt.sign({ Username: username, userId: existinguser.
+                    _id, email:existinguser.Email },
                     JWT_secret = process.env.JWT_secret,
                     { expiresIn: '1d' }
                 );
+                
                 res.cookie('refreshToken', refreshtoken,
                     // {
                     //     httpOnly: true,       // Makes the cookie inaccessible to JavaScript in the client to prevent XSS attacks
@@ -129,6 +124,7 @@ router.post('/signin', [
     }
 })
 
+
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
     console.log("token:::::", token)
@@ -139,13 +135,14 @@ const verifyToken = (req, res, next) => {
     const actualToken = token.split(' ')[1];  // Extract the token
     try {
         const decoded = jwt.verify(actualToken, process.env.JWT_secret);  // Verify the token
-        req.user = decoded;  // Attach the decoded payload to the request
-        console.log(req.user.Username)
-        next();  // Proceed to the next middleware
+         // Attach the decoded payload to the request
+        req.user = decoded;
+        console.log("user------>"+JSON.stringify(req.user)) 
+        next(); 
+        // Proceed to the next middleware
     } catch (error) {
         res.status(401).send("Invalid token");
     }
 };
 
-
-module.exports = [router, verifyToken];
+module.exports = [router,verifyToken];

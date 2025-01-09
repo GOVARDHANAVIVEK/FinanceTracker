@@ -7,7 +7,7 @@ document.getElementById('expense-form').addEventListener('submit', async (e) =>{
     const ExpenseType = document.getElementById('Type').value;
 
     const formData = {Amount,Category,ExpenseType,Description};
-    console.log(formData)
+    // console.log(formData)
 
     try {
         const token = localStorage.getItem('Access token')
@@ -21,7 +21,7 @@ document.getElementById('expense-form').addEventListener('submit', async (e) =>{
         })
         const result = await response.json();
         if (response.ok) {
-            console.log(result)
+            // console.log(result)
             // alert(result.message);
             showPopup()
             setTimeout(() => {
@@ -48,17 +48,15 @@ const logoutBtn = document.getElementById('logout-btn').addEventListener('click'
 function checkTokenExpiry() {
 const token = localStorage.getItem('Access token');
 
-console.log("token check"+token)
+// console.log("token check"+token)
 if (token) {
     const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
     const expiry = payload.exp * 1000; // Convert to milliseconds
-    console.log("payload "+payload)
+    // console.log("payload "+payload)
     if (Date.now() > expiry) {
         alert("Session expired. Please log in again.");
         handleLogout(); // Clear token and redirect to login
     }
-}else{
-    console.log("bjd")
 }
 }
 function handleLogout() {
@@ -71,7 +69,7 @@ const formatDate = (date) => {
     const day = String(currentDate.getDate()).padStart(2, '0');
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
     const year = currentDate.getFullYear();
-    console.log(`${day}-${month}-${year}`)
+    // console.log(`${day}-${month}-${year}`)
     return String(`${day}-${month}-${year}`);
 };
 
