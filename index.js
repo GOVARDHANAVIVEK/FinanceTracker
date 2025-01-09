@@ -27,7 +27,7 @@ app.use(session({
     secret: process.env.JWT_secret || 'yourSecretKey', // Make sure to replace with a strong key
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: true } // Set to true in production with HTTPS
+    cookie: { secure: false } // Set to true in production with HTTPS
 }));
 
 

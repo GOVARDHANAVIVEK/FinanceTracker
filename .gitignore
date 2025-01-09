@@ -3,6 +3,7 @@
 
 # Ignore a specific file
 env
+.env
 
 # Ignore a directory and its contents
 /node_modules/
