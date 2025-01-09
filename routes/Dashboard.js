@@ -13,7 +13,7 @@ const { use } = require('bcrypt/promises');
 const verifyToken = require('../routes/Auth')
 const {getMonth,getEmail,formatDate,getYearlyBreakdownIncomeExpenseReport,getQuarterlyCategoryWiseReport,getYearlyCategoryWiseReport,getQuarterlyIncomeExpenseReport,getYearlyIncomeExpenseReport,getMonthlyCategoryWiseReport,getMonthlyIncomeExpenseReport}=require('../middleware/helperFunctions')
 let userId = ""
-
+const fromemail = `"Finance Tracker" ${process.env.sendermail}`
 router.get('/',async (req, res) => {
     console.log("req---->"+JSON.stringify(req.session))
     
@@ -222,7 +222,7 @@ notifyUser.on('transactionCreated',(expense,email)=>{
     console.log('User email:', email);
     const mailOptions = {
         to: email,
-        from: 'govardhanavivek32@gmail.com',
+        from: fromemail,
         subject: 'New Transaction Added',
         text: `Dear user,\n\n
 
@@ -349,7 +349,7 @@ notifyUser.on('TransactionUpdated',(originalTransaction,transaction,email)=>{
     console.log("original+"+originalTransaction)
     const mailOptions = {
         to: email,
-        from: 'govardhanavivek32@gmail.com',
+        from: fromemail,
         subject: 'Transaction Updated',
         text: `
             Dear user,\n\n
@@ -406,7 +406,7 @@ router.delete('/manage-expenses',verifyToken, async (req, res) => {
 notifyUser.on('TransactionDeleted',(transaction,email)=>{
     const mailOptions = {
         to: email,
-        from: 'govardhanavivek32@gmail.com',
+        from: fromemail,
         subject: 'Transaction Removed',
         text: `
             Dear user,\n\n
@@ -581,7 +581,7 @@ const sendEmailReport = async(report,email)=>{
     });
     const mailOptions = {
         to: email,
-        from: 'govardhanavivek32@gmail.com',
+        from: fromemail,
         subject: 'Monthly Report',
         text: `
             Dear User,
