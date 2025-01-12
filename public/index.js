@@ -60,16 +60,16 @@ sendSigninBtn.addEventListener('click', async (event) => {
     }
     console.log({ username, password })
     try 
-    {        const response = await fetch('/auth/signin', {
+    {       const response = await fetch('/auth/signin', {
             method: 'POST',
             headers: {
                 "Content-Type": 'application/json'
             },
             body: JSON.stringify({ username, password })
         });
-
-        const data = await response.json();
-        if (response.ok) {
+        
+        if(response.status == 200) {
+            const data = await response.json();
             localStorage.setItem('Access token',data.accesstoken)
             console.log(data.message,data.accesstoken);
             // window.location.href = '/dashboard';
@@ -96,21 +96,24 @@ sendSigninBtn.addEventListener('click', async (event) => {
                     } else {
                         console.error('Failed to fetch dashboard:', await response.text());
                     }
+                
                 } else {
                     console.error('No token found');
                 }
-                
+            
             } catch (error) {
                 console.log("error",error)
             }
             
             // Redirect or update the UI after successful login
         } else {
-            console.error(data.message || "signin failed");
+            
+            // console.error("xxxxx"+data.message || "signin failed");
             errorMessageElement.textContent = 'Incorrect Username/Password';
             errorMessageElement.style.display = 'block';
             
         }
+    
     } catch (error) {
         errorMessageElement.textContent = 'Internal Server Error.Please try again';
         errorMessageElement.style.display = 'block';
@@ -179,8 +182,3 @@ sendSignupBtn.addEventListener('click', async (event) => {
         console.error("Error:", error);
     }
 });
-
-
-
-
-

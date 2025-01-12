@@ -9,9 +9,6 @@ const { body, validationResult } = require('express-validator');
 require('dotenv').config()
 
 
-
-
-
 router.post('/signup', async (req, res) => {
     console.log("signup...........");
     const { username, password, email } = req.body;
@@ -90,8 +87,10 @@ router.post('/signin', [
         } else {
 
             const match = await bcrypt.compare(password, existinguser.Password)
+            console.log("password match"+match)
             if (!match) {
-                return res.status(400).send("Incorrect password.")
+                console.log("not matching....")
+                return res.status(403).send("Incorrect password.")
             } else {
                 const accesstoken = jwt.sign({
                     Username: username, userId: existinguser.
@@ -116,7 +115,7 @@ router.post('/signin', [
                     //     maxAge: 24 * 60 * 60 * 1000 // Sets expiration (24 hours in this example)
                     // }
                 );
-                return res.status(201).send({ message: "Login successfully", accesstoken });
+                return res.status(200).send({ message: "Login successfully", accesstoken });
             }
         }
     } catch (error) {

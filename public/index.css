@@ -152,6 +152,7 @@ button:hover {
    
 }
 
+
 #sendMagicLink{
     padding: 0.8rem;
     font-size: 1rem;
@@ -164,3 +165,4 @@ button:hover {
     margin-top: 4px;
     transition: background 0.3s;
 }
+
